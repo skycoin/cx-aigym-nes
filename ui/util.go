@@ -11,9 +11,11 @@ import (
 	"image/png"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"os"
 	"os/user"
 	"path"
+	"time"
 
 	"github.com/fogleman/nes/nes"
 	"github.com/go-gl/gl/v2.1/gl"
@@ -50,7 +52,7 @@ func readKey(window *glfw.Window, key glfw.Key) bool {
 	return window.GetKey(key) == glfw.Press
 }
 
-func readKeys(window *glfw.Window, turbo bool) [8]bool {
+func readKeys2(window *glfw.Window, turbo bool) [8]bool {
 	var result [8]bool
 	result[nes.ButtonA] = readKey(window, glfw.KeyZ) || (turbo && readKey(window, glfw.KeyA))
 	result[nes.ButtonB] = readKey(window, glfw.KeyX) || (turbo && readKey(window, glfw.KeyS))
@@ -61,6 +63,34 @@ func readKeys(window *glfw.Window, turbo bool) [8]bool {
 	result[nes.ButtonLeft] = readKey(window, glfw.KeyLeft)
 	result[nes.ButtonRight] = readKey(window, glfw.KeyRight)
 	return result
+}
+
+func readKeys(window *glfw.Window, turbo bool) [8]bool {
+	var result [8]bool
+	keys := randomKeys()
+
+	result[nes.ButtonA] = convertIntToBool(keys & 1)
+	result[nes.ButtonB] = convertIntToBool(keys & 2)
+	result[nes.ButtonSelect] = convertIntToBool(keys & 4)
+	result[nes.ButtonStart] = convertIntToBool(keys & 8)
+	result[nes.ButtonUp] = convertIntToBool(keys & 16)
+	result[nes.ButtonDown] = convertIntToBool(keys & 32)
+	result[nes.ButtonLeft] = convertIntToBool(keys & 64)
+	result[nes.ButtonRight] = convertIntToBool(keys & 128)
+	return result
+}
+
+func convertIntToBool(v int) bool {
+	if v != 0 {
+		return true
+	} else {
+		return false
+	}
+}
+
+func randomKeys() int {
+	rand.Seed(time.Now().Unix())
+	return rand.Intn(256)
 }
 
 func readJoystick(joy glfw.Joystick, turbo bool) [8]bool {
