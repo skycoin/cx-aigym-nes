@@ -15,7 +15,6 @@ import (
 	"os"
 	"os/user"
 	"path"
-	"time"
 
 	"github.com/fogleman/nes/nes"
 	"github.com/go-gl/gl/v2.1/gl"
@@ -68,6 +67,7 @@ func readKeys2(window *glfw.Window, turbo bool) [8]bool {
 func readKeys(window *glfw.Window, turbo bool) [8]bool {
 	var result [8]bool
 	keys := randomKeys()
+	log.Printf("%d", keys)
 
 	result[nes.ButtonA] = convertIntToBool(keys & 1)
 	result[nes.ButtonB] = convertIntToBool(keys & 2)
@@ -89,8 +89,13 @@ func convertIntToBool(v int) bool {
 }
 
 func randomKeys() int {
-	rand.Seed(time.Now().Unix())
+	//var n uint8
+	//binary.Read(rand.Reader, binary.LittleEndian, &n)
+	//println(n)
+	//rand.Seed(time.Now().Unix())
+
 	return rand.Intn(256)
+	//return n
 }
 
 func readJoystick(joy glfw.Joystick, turbo bool) [8]bool {
