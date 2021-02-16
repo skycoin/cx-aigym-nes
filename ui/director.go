@@ -20,25 +20,32 @@ type Director struct {
 	view      View
 	menuView  View
 	timestamp float64
-	GlDisabled bool
-	AudioDisabled bool
+	glDisabled bool
+	audioDisabled bool
+	randomKeys bool
 }
 
-func NewDirector(window *glfw.Window, audio *Audio, glDisabled bool, audioDisabled bool) *Director {
+func NewDirector(window *glfw.Window, audio *Audio, glDisabled bool,
+	audioDisabled bool, randomKeys bool) *Director {
 	director := Director{}
 	director.window = window
 	director.audio = audio
-	director.GlDisabled = glDisabled
-	director.AudioDisabled = audioDisabled
+	director.glDisabled = glDisabled
+	director.audioDisabled = audioDisabled
+	director.randomKeys = randomKeys
 	return &director
 }
 
 func (d *Director) SetGlDisabled(glDisabled bool) {
-	d.GlDisabled = glDisabled
+	d.glDisabled = glDisabled
 }
 
 func (d *Director) SetAudioDisabled(audioDisabled bool) {
-	d.AudioDisabled = audioDisabled
+	d.audioDisabled = audioDisabled
+}
+
+func(d *Director) setRandomKeys(randomKeys bool) {
+	d.randomKeys = randomKeys
 }
 
 func (d *Director) SetTitle(title string) {
@@ -54,7 +61,7 @@ func (d *Director) SetView(view View) {
 		d.view.Enter()
 	}
 
-	if d.GlDisabled {
+	if d.glDisabled {
 		d.timestamp = float64(time.Now().UnixNano())
 	} else {
 		d.timestamp = glfw.GetTime()
@@ -63,7 +70,7 @@ func (d *Director) SetView(view View) {
 
 func (d *Director) Step() {
 	var timestamp float64
-	if !d.GlDisabled {
+	if !d.glDisabled {
 		gl.Clear(gl.COLOR_BUFFER_BIT)
 		timestamp = glfw.GetTime()
 
@@ -90,7 +97,7 @@ func (d *Director) Start(paths []string) {
 }
 
 func (d *Director) Run() {
-	if d.GlDisabled {
+	if d.glDisabled {
 		for  {
 			d.Step()
 		}

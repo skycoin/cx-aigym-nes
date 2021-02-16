@@ -22,19 +22,19 @@ type GameView struct {
 
 func NewGameView(director *Director, console *nes.Console, title, hash string) View {
 	var texture uint32
-	if !director.GlDisabled {
+	if !director.glDisabled {
 		texture = createTexture()
 	}
 	return &GameView{director, console, title, hash, texture, false, nil}
 }
 
 func (view *GameView) Enter() {
-	if !view.director.GlDisabled {
+	if !view.director.glDisabled {
 		gl.ClearColor(0, 0, 0, 1)
 		view.director.SetTitle(view.title)
 	}
 
-	if !view.director.AudioDisabled {
+	if !view.director.audioDisabled {
 		view.console.SetAudioChannel(view.director.audio.channel)
 		view.console.SetAudioSampleRate(view.director.audio.sampleRate)
 	}
@@ -56,7 +56,7 @@ func (view *GameView) Enter() {
 }
 
 func (view *GameView) Exit() {
-	if !view.director.GlDisabled {
+	if !view.director.glDisabled {
 		view.director.window.SetKeyCallback(nil)
 		view.console.SetAudioChannel(nil)
 		view.console.SetAudioSampleRate(0)
@@ -78,7 +78,7 @@ func (view *GameView) Update(t, dt float64) {
 	}
 	window := view.director.window
 	console := view.console
-	if !view.director.GlDisabled {
+	if !view.director.glDisabled {
 		if joystickReset(glfw.Joystick1) {
 			view.director.ShowMenu()
 		}
@@ -94,7 +94,7 @@ func (view *GameView) Update(t, dt float64) {
 	updateControllers(view.director, console)
 	console.StepSeconds(dt)
 
-	if !view.director.GlDisabled {
+	if !view.director.glDisabled {
 		gl.BindTexture(gl.TEXTURE_2D, view.texture)
 		setTexture(console.Buffer())
 		drawBuffer(view.director.window)
@@ -153,13 +153,20 @@ func drawBuffer(window *glfw.Window) {
 
 func updateControllers(director *Director, console *nes.Console) {
 	turbo := console.PPU.Frame%6 < 3
-	k1 := readKeys(director.window, turbo)
 
-	var j1, j2 [8]bool
-	if !director.GlDisabled {
+	var j1, j2, k1 [8]bool
+
+	if director.randomKeys {
+		k1 = readRandomKeys()
+	} else {
+		k1 =  readKeys(director.window, turbo)
+	}
+
+	if !director.glDisabled {
 		j1 = readJoystick(glfw.Joystick1, turbo)
 		j2 = readJoystick(glfw.Joystick2, turbo)
 	}
+
 
 	console.SetButtons1(combineButtons(k1, j1))
 	console.SetButtons2(j2)

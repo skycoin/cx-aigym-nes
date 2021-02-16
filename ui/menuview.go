@@ -34,7 +34,7 @@ func NewMenuView(director *Director, paths []string) View {
 	view := MenuView{}
 	view.director = director
 	view.paths = paths
-	if !director.GlDisabled {
+	if !director.glDisabled {
 		view.texture = NewTexture()
 	}
 

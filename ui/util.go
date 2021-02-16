@@ -4,6 +4,9 @@ import (
 	"crypto/md5"
 	"encoding/binary"
 	"fmt"
+	"github.com/fogleman/nes/nes"
+	"github.com/go-gl/gl/v2.1/gl"
+	"github.com/go-gl/glfw/v3.2/glfw"
 	"image"
 	"image/color"
 	"image/draw"
@@ -15,10 +18,7 @@ import (
 	"os"
 	"os/user"
 	"path"
-
-	"github.com/fogleman/nes/nes"
-	"github.com/go-gl/gl/v2.1/gl"
-	"github.com/go-gl/glfw/v3.2/glfw"
+	"time"
 )
 
 var homeDir string
@@ -29,8 +29,14 @@ func init() {
 		log.Fatalln(err)
 	}
 	homeDir = u.HomeDir
+
+	//init seed
+	initSeed()
 }
 
+func initSeed() {
+	rand.Seed(time.Now().Unix())
+}
 func thumbnailURL(hash string) string {
 	return "http://www.michaelfogleman.com/static/nes/" + hash + ".png"
 }
@@ -51,7 +57,7 @@ func readKey(window *glfw.Window, key glfw.Key) bool {
 	return window.GetKey(key) == glfw.Press
 }
 
-func readKeys2(window *glfw.Window, turbo bool) [8]bool {
+func readKeys(window *glfw.Window, turbo bool) [8]bool {
 	var result [8]bool
 	result[nes.ButtonA] = readKey(window, glfw.KeyZ) || (turbo && readKey(window, glfw.KeyA))
 	result[nes.ButtonB] = readKey(window, glfw.KeyX) || (turbo && readKey(window, glfw.KeyS))
@@ -64,7 +70,7 @@ func readKeys2(window *glfw.Window, turbo bool) [8]bool {
 	return result
 }
 
-func readKeys(window *glfw.Window, turbo bool) [8]bool {
+func readRandomKeys() [8]bool {
 	var result [8]bool
 	keys := randomKeys()
 	log.Printf("%d", keys)
@@ -89,13 +95,7 @@ func convertIntToBool(v int) bool {
 }
 
 func randomKeys() int {
-	//var n uint8
-	//binary.Read(rand.Reader, binary.LittleEndian, &n)
-	//println(n)
-	//rand.Seed(time.Now().Unix())
-
 	return rand.Intn(256)
-	//return n
 }
 
 func readJoystick(joy glfw.Joystick, turbo bool) [8]bool {

@@ -28,6 +28,7 @@ func Run(paths []string) {
 	var (
 		glDisabled = false
 		audioDisabled = true
+		randomKeys = true
 		window *glfw.Window
 		audio *Audio
 	)
@@ -37,7 +38,7 @@ func Run(paths []string) {
 		portaudio.Initialize()
 		defer portaudio.Terminate()
 
-		audio := NewAudio()
+		audio = NewAudio()
 		if err := audio.Start(); err != nil {
 			log.Fatalln(err)
 		}
@@ -71,6 +72,6 @@ func Run(paths []string) {
 
 
 	// run director
-	director := NewDirector(window, audio, glDisabled, audioDisabled)
+	director := NewDirector(window, audio, glDisabled, audioDisabled, randomKeys)
 	director.Start(paths)
 }
