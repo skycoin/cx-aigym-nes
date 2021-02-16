@@ -73,16 +73,16 @@ func readKeys(window *glfw.Window, turbo bool) [8]bool {
 func readRandomKeys() [8]bool {
 	var result [8]bool
 	keys := randomKeys()
-	log.Printf("%d", keys)
+	log.Printf("%b", keys)
 
 	result[nes.ButtonA] = convertIntToBool(keys & 1)
 	result[nes.ButtonB] = convertIntToBool(keys & 2)
-	result[nes.ButtonSelect] = convertIntToBool(keys & 4)
-	result[nes.ButtonStart] = convertIntToBool(keys & 8)
-	result[nes.ButtonUp] = convertIntToBool(keys & 16)
-	result[nes.ButtonDown] = convertIntToBool(keys & 32)
-	result[nes.ButtonLeft] = convertIntToBool(keys & 64)
-	result[nes.ButtonRight] = convertIntToBool(keys & 128)
+	//result[nes.ButtonSelect] = convertIntToBool(keys & 4)
+	//result[nes.ButtonStart] = convertIntToBool(keys & 8)
+	result[nes.ButtonUp] = convertIntToBool(keys & 4)
+	result[nes.ButtonDown] = convertIntToBool(keys & 8)
+	result[nes.ButtonLeft] = convertIntToBool(keys & 16)
+	result[nes.ButtonRight] = convertIntToBool(keys & 32)
 	return result
 }
 
@@ -95,7 +95,7 @@ func convertIntToBool(v int) bool {
 }
 
 func randomKeys() int {
-	return rand.Intn(256)
+	return rand.Intn(64)
 }
 
 func readJoystick(joy glfw.Joystick, turbo bool) [8]bool {

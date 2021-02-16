@@ -23,9 +23,10 @@ type Director struct {
 	glDisabled bool
 	audioDisabled bool
 	randomKeys bool
+	exit chan bool
 }
 
-func NewDirector(window *glfw.Window, audio *Audio, glDisabled bool,
+func NewDirector(window *glfw.Window, audio *Audio, exit chan bool, glDisabled bool,
 	audioDisabled bool, randomKeys bool) *Director {
 	director := Director{}
 	director.window = window
@@ -33,6 +34,7 @@ func NewDirector(window *glfw.Window, audio *Audio, glDisabled bool,
 	director.glDisabled = glDisabled
 	director.audioDisabled = audioDisabled
 	director.randomKeys = randomKeys
+	director.exit = exit
 	return &director
 }
 
@@ -99,7 +101,12 @@ func (d *Director) Start(paths []string) {
 func (d *Director) Run() {
 	if d.glDisabled {
 		for  {
-			d.Step()
+			select {
+				case <-d.exit:
+					d.SetView(nil)
+			default:
+				d.Step()
+			}
 		}
 	} else {
 		for !d.window.ShouldClose() {
@@ -107,9 +114,11 @@ func (d *Director) Run() {
 			d.window.SwapBuffers()
 			glfw.PollEvents()
 		}
+
+		d.SetView(nil)
 	}
 
-	d.SetView(nil)
+
 }
 
 func (d *Director) PlayGame(path string) {

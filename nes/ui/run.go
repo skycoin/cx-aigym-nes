@@ -24,10 +24,10 @@ func init() {
 	runtime.LockOSThread()
 }
 
-func Run(paths []string) {
+func Run(paths []string, exit chan bool) {
 	var (
 		glDisabled = false
-		audioDisabled = true
+		audioDisabled = false
 		randomKeys = true
 		window *glfw.Window
 		audio *Audio
@@ -72,6 +72,7 @@ func Run(paths []string) {
 
 
 	// run director
-	director := NewDirector(window, audio, glDisabled, audioDisabled, randomKeys)
+	director := NewDirector(window, audio, exit, glDisabled, audioDisabled, randomKeys)
 	director.Start(paths)
+
 }

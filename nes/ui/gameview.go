@@ -2,6 +2,7 @@ package ui
 
 import (
 	"image"
+	"os"
 
 	"github.com/fogleman/nes/nes"
 	"github.com/go-gl/gl/v2.1/gl"
@@ -32,6 +33,7 @@ func (view *GameView) Enter() {
 	if !view.director.glDisabled {
 		gl.ClearColor(0, 0, 0, 1)
 		view.director.SetTitle(view.title)
+		view.director.window.SetKeyCallback(view.onKey)
 	}
 
 	if !view.director.audioDisabled {
@@ -39,7 +41,7 @@ func (view *GameView) Enter() {
 		view.console.SetAudioSampleRate(view.director.audio.sampleRate)
 	}
 
-	//view.director.window.SetKeyCallback(view.onKey)
+
 	// load state
 	if err := view.console.LoadState(savePath(view.hash)); err == nil {
 		return
@@ -70,7 +72,11 @@ func (view *GameView) Exit() {
 	}
 	// save state
 	view.console.SaveState(savePath(view.hash))
+
+	// exit
+	os.Exit(0)
 }
+
 
 func (view *GameView) Update(t, dt float64) {
 	if dt > 1 {
@@ -156,11 +162,12 @@ func updateControllers(director *Director, console *nes.Console) {
 
 	var j1, j2, k1 [8]bool
 
-	if director.randomKeys {
+	if director.glDisabled || director.randomKeys {
 		k1 = readRandomKeys()
 	} else {
 		k1 =  readKeys(director.window, turbo)
 	}
+
 
 	if !director.glDisabled {
 		j1 = readJoystick(glfw.Joystick1, turbo)
