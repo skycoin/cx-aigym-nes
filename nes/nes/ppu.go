@@ -17,7 +17,7 @@ type PPU struct {
 	paletteData   [32]byte
 	nameTableData [2048]byte
 	oamData       [256]byte
-	front         *image.RGBA
+	Front         *image.RGBA
 	back          *image.RGBA
 
 	// PPU registers
@@ -80,7 +80,7 @@ type PPU struct {
 
 func NewPPU(console *Console) *PPU {
 	ppu := PPU{Memory: NewPPUMemory(console), console: console}
-	ppu.front = image.NewRGBA(image.Rect(0, 0, 256, 240))
+	ppu.Front = image.NewRGBA(image.Rect(0, 0, 256, 240))
 	ppu.back = image.NewRGBA(image.Rect(0, 0, 256, 240))
 	ppu.Reset()
 	return &ppu
@@ -444,7 +444,7 @@ func (ppu *PPU) nmiChange() {
 }
 
 func (ppu *PPU) setVerticalBlank() {
-	ppu.front, ppu.back = ppu.back, ppu.front
+	ppu.Front, ppu.back = ppu.back, ppu.Front
 	ppu.nmiOccurred = true
 	ppu.nmiChange()
 }

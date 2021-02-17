@@ -28,7 +28,7 @@ func Run(paths []string, exit chan bool) {
 	var (
 		glDisabled = false
 		audioDisabled = false
-		randomKeys = true
+		randomKeys = false
 		window *glfw.Window
 		audio *Audio
 	)
