@@ -1,6 +1,7 @@
 package ui
 
 import (
+	term "github.com/nsf/termbox-go"
 	"image"
 	"os"
 
@@ -14,6 +15,7 @@ const padding = 0
 type GameView struct {
 	director *Director
 	console  *nes.Console
+	manager *Manager
 	title    string
 	hash     string
 	texture  uint32
@@ -21,12 +23,12 @@ type GameView struct {
 	frames   []image.Image
 }
 
-func NewGameView(director *Director, console *nes.Console, title, hash string) View {
+func NewGameView(director *Director, console *nes.Console, manager *Manager, title, hash string) View {
 	var texture uint32
 	if !director.glDisabled {
 		texture = createTexture()
 	}
-	return &GameView{director, console, title, hash, texture, false, nil}
+	return &GameView{director, console, manager,title, hash, texture, false, nil}
 }
 
 func (view *GameView) Enter() {
@@ -112,6 +114,35 @@ func (view *GameView) Update(t, dt float64) {
 	}
 }
 
+func reset() {
+	term.Sync()
+}
+//
+//func (view *GameView) checkButtons() {
+//
+//loop:
+//	for {
+//		switch ev := term.PollEvent(); ev.Type {
+//		case term.EventKey:
+//			switch ev.Key {
+//			case term.KeyEsc:
+//				break loop
+//			case term.KeyF1:
+//				reset()
+//				fmt.Println("F1 pressed")
+//				break loop
+//			case term.KeyF2:
+//				reset()
+//				fmt.Println("F2 pressed")
+//				break loop
+//
+//			}
+//		case term.EventError:
+//			panic(ev.Err)
+//		}
+//	}
+//}
+
 func (view *GameView) onKey(window *glfw.Window,
 	key glfw.Key, scancode int, action glfw.Action, mods glfw.ModifierKey) {
 	if action == glfw.Press {
@@ -128,7 +159,19 @@ func (view *GameView) onKey(window *glfw.Window,
 			} else {
 				view.record = true
 			}
+		case glfw.Key1:
+			// load state
+			if err := view.console.LoadState(savePath(view.hash)); err == nil {
+				return
+			} else {
+				view.console.Reset()
+			}
+		case glfw.Key2:
+			// save state
+			view.console.SaveState(savePath(view.hash))
 		}
+
+
 	}
 }
 

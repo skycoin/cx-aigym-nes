@@ -130,7 +130,9 @@ func (d *Director) PlayGame(path string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	d.SetView(NewGameView(d, console, path, hash))
+
+	manager := NewManager(console)
+	d.SetView(NewGameView(d, console, manager, path, hash))
 }
 
 func (d *Director) ShowMenu() {

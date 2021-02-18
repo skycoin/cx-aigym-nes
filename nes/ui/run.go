@@ -27,11 +27,13 @@ func init() {
 func Run(paths []string, exit chan bool) {
 	var (
 		glDisabled = false
-		audioDisabled = false
+		audioDisabled = true
 		randomKeys = false
 		window *glfw.Window
 		audio *Audio
 	)
+
+
 
 	if !audioDisabled {
 		// initialize audio
@@ -70,9 +72,9 @@ func Run(paths []string, exit chan bool) {
 		gl.Enable(gl.TEXTURE_2D)
 	}
 
-
 	// run director
 	director := NewDirector(window, audio, exit, glDisabled, audioDisabled, randomKeys)
 	director.Start(paths)
+
 
 }
