@@ -1,40 +1,53 @@
 package ui
 
 import (
-	term "github.com/nsf/termbox-go"
-	"image"
-	"os"
-
+	"fmt"
 	"github.com/fogleman/nes/nes"
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
+	term "github.com/nsf/termbox-go"
+	"image"
+	"io/ioutil"
+	"os"
+	"time"
 )
 
 const padding = 0
 
 type GameView struct {
 	director *Director
+	preState []byte
 	console  *nes.Console
-	manager *Manager
-	title    string
-	hash     string
+	RomPath  string
+	RomName  string
+	RomTitle string
+	RomHash  string
 	texture  uint32
 	record   bool
 	frames   []image.Image
 }
 
-func NewGameView(director *Director, console *nes.Console, manager *Manager, title, hash string) View {
+func NewGameView(director *Director, console *nes.Console, title, hash string) View {
 	var texture uint32
 	if !director.glDisabled {
 		texture = createTexture()
 	}
-	return &GameView{director, console, manager,title, hash, texture, false, nil}
+	return &GameView{
+		director: director,
+		console:  console,
+		RomPath:  title,
+		RomTitle: title,
+		RomHash:  hash,
+		texture:  texture,
+		record:   false,
+		frames:   nil,
+	}
 }
 
 func (view *GameView) Enter() {
 	if !view.director.glDisabled {
 		gl.ClearColor(0, 0, 0, 1)
-		view.director.SetTitle(view.title)
+		view.director.SetTitle(view.RomTitle)
 		view.director.window.SetKeyCallback(view.onKey)
 	}
 
@@ -43,9 +56,8 @@ func (view *GameView) Enter() {
 		view.console.SetAudioSampleRate(view.director.audio.sampleRate)
 	}
 
-
 	// load state
-	if err := view.console.LoadState(savePath(view.hash)); err == nil {
+	if err := view.console.LoadState(savePath(view.RomHash)); err == nil {
 		return
 	} else {
 		view.console.Reset()
@@ -53,7 +65,7 @@ func (view *GameView) Enter() {
 	// load sram
 	cartridge := view.console.Cartridge
 	if cartridge.Battery != 0 {
-		if sram, err := readSRAM(sramPath(view.hash)); err == nil {
+		if sram, err := readSRAM(sramPath(view.RomHash)); err == nil {
 			cartridge.SRAM = sram
 		}
 	}
@@ -66,19 +78,17 @@ func (view *GameView) Exit() {
 		view.console.SetAudioSampleRate(0)
 	}
 
-
 	// save sram
 	cartridge := view.console.Cartridge
 	if cartridge.Battery != 0 {
-		writeSRAM(sramPath(view.hash), cartridge.SRAM)
+		writeSRAM(sramPath(view.RomHash), cartridge.SRAM)
 	}
 	// save state
-	view.console.SaveState(savePath(view.hash))
+	view.console.SaveState(savePath(view.RomHash))
 
 	// exit
 	os.Exit(0)
 }
-
 
 func (view *GameView) Update(t, dt float64) {
 	if dt > 1 {
@@ -117,6 +127,7 @@ func (view *GameView) Update(t, dt float64) {
 func reset() {
 	term.Sync()
 }
+
 //
 //func (view *GameView) checkButtons() {
 //
@@ -160,19 +171,41 @@ func (view *GameView) onKey(window *glfw.Window,
 				view.record = true
 			}
 		case glfw.Key1:
-			// load state
-			if err := view.console.LoadState(savePath(view.hash)); err == nil {
-				return
-			} else {
-				view.console.Reset()
-			}
-		case glfw.Key2:
 			// save state
-			view.console.SaveState(savePath(view.hash))
+			//if view.preConsole != nil {
+			//	view.console = view.preConsole
+			//}
+			view.preState = view.console.RAM
+			//if err := view.console.LoadState(savePath(view.RomHash)); err == nil {
+			//	return
+			//} else {
+			//	view.console.Reset()
+			//}
+		case glfw.Key2:
+			// load state
+
+			if view.preState != nil {
+				view.console.RAM = view.preState
+			}
+			//view.preConsole = view.console
+			//view.console.SaveState(savePath(view.RomHash))
+		case glfw.Key5:
+			// save state
+			//view.console.SaveState(savePath(view.RomHash))
 		}
 
-
 	}
+}
+
+func (view *GameView) saveStateToFile() error {
+	path := fmt.Sprintf("%s/%d.ram", PATH_CHECKPOINTS, time.Now().Unix())
+	err := ioutil.WriteFile(path, view.console.RAM, 0644)
+	return err
+}
+
+func (view *GameView) saveScreenshot() error {
+	path := fmt.Sprintf("%s/%d.png", PATH_CHECKPOINTS, time.Now().Unix())
+	return savePNG(path, view.console.Buffer())
 }
 
 func drawBuffer(window *glfw.Window) {
@@ -208,15 +241,13 @@ func updateControllers(director *Director, console *nes.Console) {
 	if director.glDisabled || director.randomKeys {
 		k1 = readRandomKeys()
 	} else {
-		k1 =  readKeys(director.window, turbo)
+		k1 = readKeys(director.window, turbo)
 	}
-
 
 	if !director.glDisabled {
 		j1 = readJoystick(glfw.Joystick1, turbo)
 		j2 = readJoystick(glfw.Joystick2, turbo)
 	}
-
 
 	console.SetButtons1(combineButtons(k1, j1))
 	console.SetButtons2(j2)

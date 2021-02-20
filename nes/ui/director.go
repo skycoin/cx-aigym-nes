@@ -15,15 +15,15 @@ type View interface {
 }
 
 type Director struct {
-	window    *glfw.Window
-	audio     *Audio
-	view      View
-	menuView  View
-	timestamp float64
-	glDisabled bool
+	window        *glfw.Window
+	audio         *Audio
+	view          View
+	menuView      View
+	timestamp     float64
+	glDisabled    bool
 	audioDisabled bool
-	randomKeys bool
-	exit chan bool
+	randomKeys    bool
+	exit          chan bool
 }
 
 func NewDirector(window *glfw.Window, audio *Audio, exit chan bool, glDisabled bool,
@@ -46,7 +46,7 @@ func (d *Director) SetAudioDisabled(audioDisabled bool) {
 	d.audioDisabled = audioDisabled
 }
 
-func(d *Director) setRandomKeys(randomKeys bool) {
+func (d *Director) setRandomKeys(randomKeys bool) {
 	d.randomKeys = randomKeys
 }
 
@@ -76,7 +76,6 @@ func (d *Director) Step() {
 		gl.Clear(gl.COLOR_BUFFER_BIT)
 		timestamp = glfw.GetTime()
 
-
 	} else {
 		timestamp = float64(time.Now().UnixNano())
 	}
@@ -100,10 +99,10 @@ func (d *Director) Start(paths []string) {
 
 func (d *Director) Run() {
 	if d.glDisabled {
-		for  {
+		for {
 			select {
-				case <-d.exit:
-					d.SetView(nil)
+			case <-d.exit:
+				d.SetView(nil)
 			default:
 				d.Step()
 			}
@@ -118,7 +117,6 @@ func (d *Director) Run() {
 		d.SetView(nil)
 	}
 
-
 }
 
 func (d *Director) PlayGame(path string) {
@@ -131,8 +129,7 @@ func (d *Director) PlayGame(path string) {
 		log.Fatalln(err)
 	}
 
-	manager := NewManager(console)
-	d.SetView(NewGameView(d, console, manager, path, hash))
+	d.SetView(NewGameView(d, console, path, hash))
 }
 
 func (d *Director) ShowMenu() {
