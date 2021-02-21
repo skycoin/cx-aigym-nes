@@ -1,7 +1,7 @@
 package ui
 
 import (
-	"crypto/md5"
+	"crypto/sha256"
 	"encoding/binary"
 	"fmt"
 	"github.com/fogleman/nes/nes"
@@ -155,7 +155,7 @@ func hashFile(path string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%x", md5.Sum(data)), nil
+	return fmt.Sprintf("%x", sha256.Sum256(data)), nil
 }
 
 func createTexture() uint32 {

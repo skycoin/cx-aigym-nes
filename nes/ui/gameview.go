@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"github.com/fogleman/nes/nes"
 	"github.com/go-gl/gl/v2.1/gl"
@@ -13,18 +15,21 @@ import (
 )
 
 const padding = 0
+const PATH_CHECKPOINTS = "../checkpoints"
 
 type GameView struct {
-	director *Director
-	preState []byte
-	console  *nes.Console
-	RomPath  string
-	RomName  string
-	RomTitle string
-	RomHash  string
-	texture  uint32
-	record   bool
-	frames   []image.Image
+	director  *Director
+	state     []byte
+	StateHash string `json:"state_hash"`
+	console   *nes.Console
+	RomPath   string `json:"rom_path"`
+	RomName   string `json:"rom_name"`
+	RomTitle  string `json:"rom_title"`
+	RomHash   string `json:"rom_hash"`
+	texture   uint32
+	record    bool
+	frames    []image.Image
+	Timestamp int64 `json:"timestamp"`
 }
 
 func NewGameView(director *Director, console *nes.Console, title, hash string) View {
@@ -39,7 +44,7 @@ func NewGameView(director *Director, console *nes.Console, title, hash string) V
 		RomTitle: title,
 		RomHash:  hash,
 		texture:  texture,
-		record:   false,
+		record:   true,
 		frames:   nil,
 	}
 }
@@ -128,6 +133,41 @@ func reset() {
 	term.Sync()
 }
 
+func (view *GameView) saveState() {
+	view.state = view.console.SaveStateToBytes()
+}
+
+func (view *GameView) loadState() {
+	if view.state != nil {
+		view.console.LoadStateFromBytes(view.state)
+	}
+}
+
+func (view *GameView) saveStateToFiles(now int64) error {
+	path := fmt.Sprintf("%s/%d.ram", PATH_CHECKPOINTS, now)
+	return view.console.SaveState(path)
+}
+
+func (view *GameView) saveToJson(now int64) error {
+	view.StateHash = fmt.Sprintf("%x", sha256.Sum256(view.state))
+	file, err := json.MarshalIndent(view, "", " ")
+	if err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf("%s/%d.json", PATH_CHECKPOINTS, now)
+	return ioutil.WriteFile(path, file, 0644)
+}
+
+func (view *GameView) save() error {
+	now := time.Now().Unix()
+	view.Timestamp = now
+	view.saveStateToFiles(now)
+	view.saveScreenshot(now)
+	view.saveToJson(now)
+	return nil
+}
+
 //
 //func (view *GameView) checkButtons() {
 //
@@ -171,41 +211,28 @@ func (view *GameView) onKey(window *glfw.Window,
 				view.record = true
 			}
 		case glfw.Key1:
-			// save state
-			//if view.preConsole != nil {
-			//	view.console = view.preConsole
-			//}
-			view.preState = view.console.RAM
-			//if err := view.console.LoadState(savePath(view.RomHash)); err == nil {
-			//	return
-			//} else {
-			//	view.console.Reset()
-			//}
-		case glfw.Key2:
-			// load state
+			// save state to bytes
+			view.saveState()
 
-			if view.preState != nil {
-				view.console.RAM = view.preState
-			}
-			//view.preConsole = view.console
-			//view.console.SaveState(savePath(view.RomHash))
+		case glfw.Key2:
+			// load state from bytes
+			view.loadState()
+
 		case glfw.Key5:
-			// save state
-			//view.console.SaveState(savePath(view.RomHash))
+			// save state to file
+			view.save()
 		}
 
 	}
 }
 
-func (view *GameView) saveStateToFile() error {
-	path := fmt.Sprintf("%s/%d.ram", PATH_CHECKPOINTS, time.Now().Unix())
-	err := ioutil.WriteFile(path, view.console.RAM, 0644)
-	return err
+func (view *GameView) saveScreenshot(now int64) error {
+	path := fmt.Sprintf("%s/%d.png", PATH_CHECKPOINTS, now)
+	return savePNG(path, view.console.Buffer())
 }
 
-func (view *GameView) saveScreenshot() error {
-	path := fmt.Sprintf("%s/%d.png", PATH_CHECKPOINTS, time.Now().Unix())
-	return savePNG(path, view.console.Buffer())
+func (view *GameView) captureImageFrame() *image.RGBA {
+	return view.console.PPU.Front
 }
 
 func drawBuffer(window *glfw.Window) {

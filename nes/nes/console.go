@@ -1,6 +1,7 @@
 package nes
 
 import (
+	"bytes"
 	"encoding/gob"
 	"image"
 	"image/color"
@@ -112,6 +113,7 @@ func (console *Console) SaveState(filename string) error {
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return err
 	}
+
 	file, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -119,6 +121,19 @@ func (console *Console) SaveState(filename string) error {
 	defer file.Close()
 	encoder := gob.NewEncoder(file)
 	return console.Save(encoder)
+}
+func (console *Console) SaveStateToBytes() []byte {
+	var buff bytes.Buffer
+	encoder := gob.NewEncoder(&buff)
+	console.Save(encoder)
+
+	return buff.Bytes()
+}
+
+func (console *Console) LoadStateFromBytes(byteArr []byte) error {
+	buff := bytes.NewBuffer(byteArr)
+	decoder := gob.NewDecoder(buff)
+	return console.Load(decoder)
 }
 
 func (console *Console) Save(encoder *gob.Encoder) error {
