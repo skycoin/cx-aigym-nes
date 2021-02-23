@@ -1,12 +1,12 @@
 package ui
 
 import (
-	"log"
-	"runtime"
-
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/gordonklaus/portaudio"
+	"log"
+	"os"
+	"runtime"
 )
 
 const (
@@ -18,22 +18,20 @@ const (
 
 func init() {
 	// we need a parallel OS thread to avoid audio stuttering
-	runtime.GOMAXPROCS(2)
+	runtime.GOMAXPROCS(runtime.NumCPU() * 2)
 
 	// we need to keep OpenGL calls on a single thread
 	runtime.LockOSThread()
 }
 
-func Run(paths []string, exit chan bool) {
+func Run(paths []string, signalChan chan os.Signal, doneChan chan int) {
 	var (
-		glDisabled = false
+		glDisabled    = true
 		audioDisabled = true
-		randomKeys = false
-		window *glfw.Window
-		audio *Audio
+		randomKeys    = false
+		window        *glfw.Window
+		audio         *Audio
 	)
-
-
 
 	if !audioDisabled {
 		// initialize audio
@@ -46,7 +44,6 @@ func Run(paths []string, exit chan bool) {
 		}
 		defer audio.Stop()
 	}
-
 
 	if !glDisabled {
 		// initialize glfw
@@ -73,8 +70,7 @@ func Run(paths []string, exit chan bool) {
 	}
 
 	// run director
-	director := NewDirector(window, audio, exit, glDisabled, audioDisabled, randomKeys)
+	director := NewDirector(window, audio, signalChan, doneChan, glDisabled, audioDisabled, randomKeys)
 	director.Start(paths)
-
 
 }

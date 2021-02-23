@@ -10,7 +10,7 @@ import (
 	term "github.com/nsf/termbox-go"
 	"image"
 	"io/ioutil"
-	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -18,41 +18,44 @@ const padding = 0
 const PATH_CHECKPOINTS = "../checkpoints"
 
 type GameView struct {
-	director  *Director
-	state     []byte
-	StateHash string `json:"state_hash"`
-	console   *nes.Console
-	RomPath   string `json:"rom_path"`
-	RomName   string `json:"rom_name"`
-	RomTitle  string `json:"rom_title"`
-	RomHash   string `json:"rom_hash"`
-	texture   uint32
-	record    bool
-	frames    []image.Image
-	Timestamp int64 `json:"timestamp"`
+	director   *Director
+	state      []byte
+	StateHash  string `json:"state_hash"`
+	console    *nes.Console
+	RomPath    string `json:"rom_path"`
+	RomName    string `json:"rom_name"`
+	RomHash    string `json:"rom_hash"`
+	texture    uint32
+	record     bool
+	FrameIndex int `json:"frame_index"`
+	frames     []image.Image
+	Timestamp  int64 `json:"timestamp"`
 }
 
-func NewGameView(director *Director, console *nes.Console, title, hash string) View {
+func NewGameView(director *Director, console *nes.Console, path string, hash string) View {
 	var texture uint32
 	if !director.glDisabled {
 		texture = createTexture()
 	}
+
+	name := filepath.Base(path)
 	return &GameView{
-		director: director,
-		console:  console,
-		RomPath:  title,
-		RomTitle: title,
-		RomHash:  hash,
-		texture:  texture,
-		record:   true,
-		frames:   nil,
+		director:   director,
+		console:    console,
+		RomName:    name,
+		RomPath:    path,
+		RomHash:    hash,
+		FrameIndex: 0,
+		texture:    texture,
+		record:     true,
+		frames:     nil,
 	}
 }
 
 func (view *GameView) Enter() {
 	if !view.director.glDisabled {
 		gl.ClearColor(0, 0, 0, 1)
-		view.director.SetTitle(view.RomTitle)
+		view.director.SetTitle(view.RomName)
 		view.director.window.SetKeyCallback(view.onKey)
 	}
 
@@ -91,8 +94,6 @@ func (view *GameView) Exit() {
 	// save state
 	view.console.SaveState(savePath(view.RomHash))
 
-	// exit
-	os.Exit(0)
 }
 
 func (view *GameView) Update(t, dt float64) {
@@ -127,6 +128,9 @@ func (view *GameView) Update(t, dt float64) {
 	if view.record {
 		view.frames = append(view.frames, copyImage(console.Buffer()))
 	}
+
+	// count frame
+	view.FrameIndex++
 }
 
 func reset() {
@@ -149,6 +153,7 @@ func (view *GameView) saveStateToFiles(now int64) error {
 }
 
 func (view *GameView) saveToJson(now int64) error {
+
 	view.StateHash = fmt.Sprintf("%x", sha256.Sum256(view.state))
 	file, err := json.MarshalIndent(view, "", " ")
 	if err != nil {

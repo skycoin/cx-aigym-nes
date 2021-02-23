@@ -2,6 +2,7 @@ package ui
 
 import (
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/binary"
 	"fmt"
 	"github.com/fogleman/nes/nes"
@@ -155,7 +156,9 @@ func hashFile(path string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%x", sha256.Sum256(data)), nil
+
+	h := sha256.Sum256(data)
+	return base64.StdEncoding.EncodeToString(h[:]), nil
 }
 
 func createTexture() uint32 {

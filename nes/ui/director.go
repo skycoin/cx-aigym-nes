@@ -5,6 +5,7 @@ import (
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"log"
+	"os"
 	"time"
 )
 
@@ -23,10 +24,12 @@ type Director struct {
 	glDisabled    bool
 	audioDisabled bool
 	randomKeys    bool
-	exit          chan bool
+	doneChan      chan int
+	signalChan    chan os.Signal
 }
 
-func NewDirector(window *glfw.Window, audio *Audio, exit chan bool, glDisabled bool,
+func NewDirector(window *glfw.Window, audio *Audio,
+	signalChan chan os.Signal, doneChan chan int, glDisabled bool,
 	audioDisabled bool, randomKeys bool) *Director {
 	director := Director{}
 	director.window = window
@@ -34,7 +37,8 @@ func NewDirector(window *glfw.Window, audio *Audio, exit chan bool, glDisabled b
 	director.glDisabled = glDisabled
 	director.audioDisabled = audioDisabled
 	director.randomKeys = randomKeys
-	director.exit = exit
+	director.doneChan = doneChan
+	director.signalChan = signalChan
 	return &director
 }
 
@@ -101,10 +105,13 @@ func (d *Director) Run() {
 	if d.glDisabled {
 		for {
 			select {
-			case <-d.exit:
+			case <-d.signalChan:
 				d.SetView(nil)
+				d.doneChan <- 0
+				return
 			default:
 				d.Step()
+				time.Sleep(10 * time.Millisecond)
 			}
 		}
 	} else {

@@ -1,34 +1,33 @@
 package main
 
 import (
+	"github.com/fogleman/nes/ui"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
 	"path"
 	"strings"
-	"syscall"
-
-	"github.com/fogleman/nes/ui"
 )
 
 func main() {
 
-	c := make(chan os.Signal)
-	exit := make(chan bool, 1)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	signalChan := make(chan os.Signal, 1)
+	done := make(chan int)
+	signal.Notify(signalChan, os.Interrupt)
+
 	go func() {
-		<-c
-		exit <- true
+		log.SetFlags(0)
+		paths := getPaths()
+		if len(paths) == 0 {
+			log.Fatalln("no rom files specified or found")
+		}
+		ui.Run(paths, signalChan, done)
 	}()
 
+	code := <-done
+	os.Exit(code)
 
-	log.SetFlags(0)
-	paths := getPaths()
-	if len(paths) == 0 {
-		log.Fatalln("no rom files specified or found")
-	}
-	ui.Run(paths, exit)
 }
 
 func getPaths() []string {
