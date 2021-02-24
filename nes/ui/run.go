@@ -18,7 +18,7 @@ const (
 
 func init() {
 	// we need a parallel OS thread to avoid audio stuttering
-	runtime.GOMAXPROCS(runtime.NumCPU() * 2)
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	// we need to keep OpenGL calls on a single thread
 	runtime.LockOSThread()
