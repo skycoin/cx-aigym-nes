@@ -1,62 +1,14 @@
 package main
 
 import (
-	"github.com/fogleman/nes/ui"
-	"io/ioutil"
-	"log"
+	"fmt"
+	"github.com/fogleman/nes/cmd"
 	"os"
-	"os/signal"
-	"path"
-	"strings"
 )
 
 func main() {
-
-	signalChan := make(chan os.Signal, 1)
-	done := make(chan int)
-	signal.Notify(signalChan, os.Interrupt)
-
-	go func() {
-		log.SetFlags(0)
-		paths := getPaths()
-		if len(paths) == 0 {
-			log.Fatalln("no rom files specified or found")
-		}
-		ui.Run(paths, signalChan, done)
-	}()
-
-	code := <-done
-	os.Exit(code)
-
-}
-
-func getPaths() []string {
-	var arg string
-	args := os.Args[1:]
-	if len(args) == 1 {
-		arg = args[0]
-	} else {
-		arg, _ = os.Getwd()
-	}
-	info, err := os.Stat(arg)
-	if err != nil {
-		return nil
-	}
-	if info.IsDir() {
-		infos, err := ioutil.ReadDir(arg)
-		if err != nil {
-			return nil
-		}
-		var result []string
-		for _, info := range infos {
-			name := info.Name()
-			if !strings.HasSuffix(name, ".nes") {
-				continue
-			}
-			result = append(result, path.Join(arg, name))
-		}
-		return result
-	} else {
-		return []string{arg}
+	if err := cmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }
