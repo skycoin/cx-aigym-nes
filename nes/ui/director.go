@@ -4,7 +4,7 @@ import (
 	"github.com/fogleman/nes/nes"
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"time"
 )
@@ -131,6 +131,8 @@ func (d *Director) PlayGame(path string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	log.Infof("rom hash = %s", hash)
 	console, err := nes.NewConsole(path)
 	if err != nil {
 		log.Fatalln(err)
