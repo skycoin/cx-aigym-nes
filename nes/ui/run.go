@@ -4,9 +4,13 @@ import (
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/gordonklaus/portaudio"
+	"github.com/nsf/termbox-go"
+	"io/ioutil"
 	"log"
 	"os"
+	"path"
 	"runtime"
+	"strings"
 )
 
 const (
@@ -46,6 +50,7 @@ func Run(paths []string, signalChan chan os.Signal, doneChan chan int) {
 	}
 
 	if !glDisabled {
+
 		// initialize glfw
 		if err := glfw.Init(); err != nil {
 			log.Fatalln(err)
@@ -55,6 +60,7 @@ func Run(paths []string, signalChan chan os.Signal, doneChan chan int) {
 		// create window
 		glfw.WindowHint(glfw.ContextVersionMajor, 2)
 		glfw.WindowHint(glfw.ContextVersionMinor, 1)
+
 		var err error
 		window, err = glfw.CreateWindow(width*scale, height*scale, title, nil, nil)
 		if err != nil {
@@ -67,10 +73,47 @@ func Run(paths []string, signalChan chan os.Signal, doneChan chan int) {
 			log.Fatalln(err)
 		}
 		gl.Enable(gl.TEXTURE_2D)
+	} else {
+		err := termbox.Init()
+		if err != nil {
+			panic(err)
+		}
+		defer termbox.Close()
+
 	}
 
 	// run director
 	director := NewDirector(window, audio, signalChan, doneChan, glDisabled, audioDisabled, randomKeys)
 	director.Start(paths)
+}
 
+func GetPaths() []string {
+	var arg string
+	args := os.Args[1:]
+	if len(args) == 1 {
+		arg = args[0]
+	} else {
+		arg, _ = os.Getwd()
+	}
+	info, err := os.Stat(arg)
+	if err != nil {
+		return nil
+	}
+	if info.IsDir() {
+		infos, err := ioutil.ReadDir(arg)
+		if err != nil {
+			return nil
+		}
+		var result []string
+		for _, info := range infos {
+			name := info.Name()
+			if !strings.HasSuffix(name, ".nes") {
+				continue
+			}
+			result = append(result, path.Join(arg, name))
+		}
+		return result
+	} else {
+		return []string{arg}
+	}
 }

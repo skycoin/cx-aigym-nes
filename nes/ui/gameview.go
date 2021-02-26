@@ -7,7 +7,6 @@ import (
 	"github.com/fogleman/nes/nes"
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
-	term "github.com/nsf/termbox-go"
 	"image"
 	"io/ioutil"
 	"path/filepath"
@@ -131,10 +130,6 @@ func (view *GameView) Update(t, dt float64) {
 
 	// count frame
 	view.FrameIndex++
-}
-
-func reset() {
-	term.Sync()
 }
 
 func (view *GameView) saveState() {

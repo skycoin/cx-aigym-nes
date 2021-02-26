@@ -4,6 +4,7 @@ import (
 	"github.com/fogleman/nes/nes"
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
+	"github.com/nsf/termbox-go"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"time"
@@ -102,13 +103,42 @@ func (d *Director) Start(paths []string) {
 }
 
 func (d *Director) Run() {
+	view := d.view.(*GameView)
+
 	if d.glDisabled {
+
+		eventQueue := make(chan termbox.Event)
+		go func() {
+			for {
+				eventQueue <- termbox.PollEvent()
+			}
+		}()
+
 		for {
 			select {
 			case <-d.signalChan:
 				d.SetView(nil)
 				d.doneChan <- 0
 				return
+			case ev := <-eventQueue:
+				if ev.Type == termbox.EventKey {
+					switch ev.Key {
+					case termbox.KeyCtrlC:
+						log.Infof("Key pressed Ctrl + C:  %v", ev.Ch)
+						d.doneChan <- 0
+						return
+					case termbox.KeyCtrlA:
+						log.Infof("Key pressed Ctrl + A: %v", ev.Ch)
+						view.saveState()
+					case termbox.KeyCtrlB:
+						log.Infof("Key pressed Ctrl + B: %v", ev.Ch)
+						view.loadState()
+					case termbox.KeyCtrlD:
+						log.Infof("Key pressed Ctrl + D:  %v", ev.Ch)
+						view.save()
+					}
+				}
+
 			default:
 				d.Step()
 				time.Sleep(10 * time.Millisecond)
