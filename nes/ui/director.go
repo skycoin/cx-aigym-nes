@@ -4,9 +4,9 @@ import (
 	"github.com/fogleman/nes/nes"
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
-	"github.com/nsf/termbox-go"
 	log "github.com/sirupsen/logrus"
 	"os"
+	"os/exec"
 	"time"
 )
 
@@ -30,7 +30,7 @@ type Director struct {
 }
 
 func NewDirector(window *glfw.Window, audio *Audio,
-	signalChan chan os.Signal, doneChan chan int, glDisabled bool,
+	signalChan chan os.Signal, glDisabled bool,
 	audioDisabled bool, randomKeys bool) *Director {
 	director := Director{}
 	director.window = window
@@ -38,7 +38,6 @@ func NewDirector(window *glfw.Window, audio *Audio,
 	director.glDisabled = glDisabled
 	director.audioDisabled = audioDisabled
 	director.randomKeys = randomKeys
-	director.doneChan = doneChan
 	director.signalChan = signalChan
 	return &director
 }
@@ -107,43 +106,34 @@ func (d *Director) Run() {
 
 	if d.glDisabled {
 
-		eventQueue := make(chan termbox.Event)
-		go func() {
-			for {
-				eventQueue <- termbox.PollEvent()
-			}
-		}()
+		// read character control
+		control := inputControl()
 
+	StepLoop:
 		for {
 			select {
 			case <-d.signalChan:
-				d.SetView(nil)
-				d.doneChan <- 0
-				return
-			case ev := <-eventQueue:
-				if ev.Type == termbox.EventKey {
-					switch ev.Key {
-					case termbox.KeyCtrlC:
-						log.Infof("Key pressed Ctrl + C:  %v", ev.Ch)
-						d.doneChan <- 0
-						return
-					case termbox.KeyCtrlA:
-						log.Infof("Key pressed Ctrl + A: %v", ev.Ch)
-						view.saveState()
-					case termbox.KeyCtrlB:
-						log.Infof("Key pressed Ctrl + B: %v", ev.Ch)
-						view.loadState()
-					case termbox.KeyCtrlD:
-						log.Infof("Key pressed Ctrl + D:  %v", ev.Ch)
-						view.save()
-					}
+				break StepLoop
+			case ch := <-control:
+				switch ch {
+				case "1":
+					log.Infof("Key pressed 1: %v", ch)
+					view.saveState()
+				case "2":
+					log.Infof("Key pressed 2: %v", ch)
+					view.loadState()
+				case "5":
+					log.Infof("Key pressed 5:  %v", ch)
+					view.save()
 				}
-
 			default:
 				d.Step()
-				time.Sleep(10 * time.Millisecond)
+				time.Sleep(100 * time.Millisecond)
 			}
 		}
+
+		d.SetView(nil)
+
 	} else {
 		for !d.window.ShouldClose() {
 			d.Step()
@@ -154,6 +144,26 @@ func (d *Director) Run() {
 		d.SetView(nil)
 	}
 
+}
+
+func inputControl() <-chan string {
+	ch := make(chan string)
+	go func(ch chan string) {
+		// disable input buffering
+		exec.Command("stty", "-F", "/dev/tty", "cbreak", "min", "1").Run()
+		// do not display entered characters on the screen
+		exec.Command("stty", "-F", "/dev/tty", "-echo").Run()
+		var b []byte = make([]byte, 1)
+		for {
+			os.Stdin.Read(b)
+			character := string(b)
+			if character == "1" || character == "2" || character == "5" {
+				ch <- string(b)
+			}
+		}
+	}(ch)
+
+	return ch
 }
 
 func (d *Director) PlayGame(path string) {

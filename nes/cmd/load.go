@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 )
 
@@ -27,7 +28,10 @@ var (
 			signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
 			go func() {
-				ui.Run(paths, signalChan, done)
+				// we need to keep OpenGL calls on a single thread
+				runtime.LockOSThread()
+				ui.Run(paths, signalChan)
+				done <- 0
 			}()
 
 			code := <-done

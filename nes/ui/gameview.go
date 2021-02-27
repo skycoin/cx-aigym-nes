@@ -7,6 +7,7 @@ import (
 	"github.com/fogleman/nes/nes"
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
+	log "github.com/sirupsen/logrus"
 	"image"
 	"io/ioutil"
 	"path/filepath"
@@ -133,10 +134,12 @@ func (view *GameView) Update(t, dt float64) {
 }
 
 func (view *GameView) saveState() {
+	log.Infof("Save state to buffer bytes: %v", view.console)
 	view.state = view.console.SaveStateToBytes()
 }
 
 func (view *GameView) loadState() {
+	log.Infof("Load state from checkpoint: %v", view.state)
 	if view.state != nil {
 		view.console.LoadStateFromBytes(view.state)
 	}
@@ -160,6 +163,7 @@ func (view *GameView) saveToJson(now int64) error {
 }
 
 func (view *GameView) save() error {
+	log.Infof("save state of game to %s: %v", PATH_CHECKPOINTS, view)
 	now := time.Now().Unix()
 	view.Timestamp = now
 	view.saveStateToFiles(now)
@@ -167,32 +171,6 @@ func (view *GameView) save() error {
 	view.saveToJson(now)
 	return nil
 }
-
-//
-//func (view *GameView) checkButtons() {
-//
-//loop:
-//	for {
-//		switch ev := term.PollEvent(); ev.Type {
-//		case term.EventKey:
-//			switch ev.Key {
-//			case term.KeyEsc:
-//				break loop
-//			case term.KeyF1:
-//				reset()
-//				fmt.Println("F1 pressed")
-//				break loop
-//			case term.KeyF2:
-//				reset()
-//				fmt.Println("F2 pressed")
-//				break loop
-//
-//			}
-//		case term.EventError:
-//			panic(ev.Err)
-//		}
-//	}
-//}
 
 func (view *GameView) onKey(window *glfw.Window,
 	key glfw.Key, scancode int, action glfw.Action, mods glfw.ModifierKey) {
