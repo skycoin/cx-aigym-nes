@@ -1,13 +1,14 @@
 package cmd
 
 import (
-	"github.com/fogleman/nes/ui"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 	"os"
 	"os/signal"
 	"runtime"
 	"syscall"
+
+	"github.com/skycoin/cx-aigym-nes/nes/ui"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
 
 var (

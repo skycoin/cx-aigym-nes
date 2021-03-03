@@ -5,9 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"fmt"
-	"github.com/fogleman/nes/nes"
-	"github.com/go-gl/gl/v2.1/gl"
-	"github.com/go-gl/glfw/v3.2/glfw"
 	"image"
 	"image/color"
 	"image/draw"
@@ -21,6 +18,10 @@ import (
 	"path"
 	"strings"
 	"time"
+
+	"github.com/skycoin/cx-aigym-nes/nes/nes"
+	"github.com/go-gl/gl/v2.1/gl"
+	"github.com/go-gl/glfw/v3.2/glfw"
 )
 
 var homeDir string

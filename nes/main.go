@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/fogleman/nes/cmd"
 	"os"
 	"runtime"
+
+	"github.com/skycoin/cx-aigym-nes/nes/cmd"
 )
 
 func init() {
