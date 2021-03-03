@@ -8,7 +8,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/cbrom/cx-aigym-nes/nes/nes"
+	"github.com/skycoin/cx-aigym-nes/nes/nes"
 )
 
 func testRom(path string) (err error) {

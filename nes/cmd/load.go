@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"syscall"
 
-	"github.com/cbrom/cx-aigym-nes/nes/ui"
+	"github.com/skycoin/cx-aigym-nes/nes/ui"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

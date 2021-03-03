@@ -5,7 +5,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/cbrom/cx-aigym-nes/nes/cmd"
+	"github.com/skycoin/cx-aigym-nes/nes/cmd"
 )
 
 func init() {
