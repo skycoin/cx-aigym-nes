@@ -79,18 +79,17 @@ func main() {
 }
 
 func runUI(path, fileType string) error {
-	signalChan := make(chan os.Signal, 1)
-
 	if path == "" {
 		log.Errorf("No %s files specified or found", fileType)
 		os.Exit(1)
-
 	}
-	paths := []string{path}
 
+	signalChan := make(chan os.Signal, 1)
+	paths := []string{path}
 	runtime.LockOSThread()
 	ui.Run(paths, signalChan)
 
+	defer close(signalChan)
 	os.Exit(0)
 
 	return nil
