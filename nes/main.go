@@ -2,9 +2,7 @@ package main
 
 import (
 	"os"
-	"os/signal"
 	"runtime"
-	"syscall"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/skycoin/cx-aigym-nes/nes/ui"
@@ -45,43 +43,32 @@ func main() {
 	app := &cli.App{
 		Name:    "cx-aigym-nes",
 		Version: "1.0.0",
-		Commands: []*cli.Command{
-			{
-				Name:    "loadrom",
-				Aliases: []string{"lr"},
-				Usage:   "load rom file/s",
-				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:        "file",
-						Value:       "",
-						Aliases:     []string{"f"},
-						Usage:       "load .rom file/s",
-						Destination: &romPath,
-						Required:    true,
-					},
-				},
-				Action: func(c *cli.Context) error {
-					return runUI(romPath, "rom")
-				},
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:        "loadrom",
+				Value:       "",
+				Aliases:     []string{"lr"},
+				Usage:       "load .rom file/s",
+				Destination: &romPath,
 			},
-			{
-				Name:    "loadjson",
-				Aliases: []string{"lj"},
-				Usage:   "load json file/s",
-				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:        "file",
-						Value:       "",
-						Aliases:     []string{"f"},
-						Usage:       "load .json file/s",
-						Destination: &jsonPath,
-						Required:    true,
-					},
-				},
-				Action: func(c *cli.Context) error {
-					return runUI(jsonPath, "json")
-				},
+			&cli.StringFlag{
+				Name:        "loadjson",
+				Value:       "",
+				Aliases:     []string{"lj"},
+				Usage:       "load .json file/s",
+				Destination: &jsonPath,
 			},
+		},
+		Action: func(c *cli.Context) error {
+			if romPath != "" {
+				return runUI(romPath, "rom")
+			} else if jsonPath != "" {
+				return runUI(jsonPath, "json")
+			} else {
+				log.Error("No files specified or found")
+				os.Exit(1)
+			}
+			return nil
 		},
 	}
 
@@ -94,7 +81,7 @@ func main() {
 func runUI(path, fileType string) error {
 	signalChan := make(chan os.Signal, 1)
 	done := make(chan int)
-	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	// signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
 	if path == "" {
 		log.Errorf("No %s files specified or found", fileType)
@@ -102,9 +89,13 @@ func runUI(path, fileType string) error {
 
 	}
 	paths := []string{path}
+
 	runtime.LockOSThread()
 	ui.Run(paths, signalChan)
+	done <- 0
+
 	code := <-done
 	os.Exit(code)
+
 	return nil
 }
