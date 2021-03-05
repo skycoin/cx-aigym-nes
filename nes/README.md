@@ -36,7 +36,13 @@ compile the binary and place it in your `$GOPATH/bin` directory.
 
 ### Usage
 
-    nes [rom_file|rom_directory]
+    go run main.go [file_type flag] [rom_file|rom_directory]
+    go run main.go help 
+
+### Example
+
+    go run nes/main.go -loadrom "path to rom file"
+    go run nes/main.go -loadjson "path to json file"
 
 1. If no arguments are specified, the program will look for rom files in
 the current working directory.
