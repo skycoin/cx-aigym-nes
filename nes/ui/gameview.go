@@ -263,6 +263,7 @@ func updateControllers(director *Director, console *nes.Console) {
 	console.SetButtons2(j2)
 }
 
+//Implement "GetRomFilename"" And "GetRomHash()" #22
 func GetRomFilename() string {
 	if currentGameView == nil || currentGameView.RomName == "" {
 		log.Panic("no rom is loaded")
