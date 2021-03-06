@@ -84,13 +84,24 @@ func TestScoreExtractor_SuperMarioBros(t *testing.T) {
 		want     SuperMarioBros
 	}{
 		{
-			scenario: "Super Mario Bros",
+			scenario: "Super Mario Bros 2-2",
 			filename: "./checkpoints_test_data/1615043111.ram",
 			want: SuperMarioBros{
 				Lives:      1,
 				World:      2,
 				Level:      2,
 				MarioScore: 43750,
+				LuigiScore: 0,
+			},
+		},
+		{
+			scenario: "Super Mario Bros 1-2",
+			filename: "./checkpoints_test_data/1615041930.ram",
+			want: SuperMarioBros{
+				Lives:      1,
+				World:      1,
+				Level:      2,
+				MarioScore: 20250,
 				LuigiScore: 0,
 			},
 		},
