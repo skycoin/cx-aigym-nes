@@ -39,6 +39,6 @@ func ReadRandomKeys(window *glfw.Window, turbo bool) [8]bool {
 }
 
 // Inject injects ReadRandomKeys to gameview
-func Inject() {
+func init() {
 	ui.ReadKeys = ReadRandomKeys
 }

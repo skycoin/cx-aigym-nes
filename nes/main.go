@@ -5,7 +5,7 @@ import (
 	"runtime"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/skycoin/cx-aigym-nes/nes/cmd"
+	_ "github.com/skycoin/cx-aigym-nes/nes/cmd"
 	"github.com/skycoin/cx-aigym-nes/nes/ui"
 	"github.com/urfave/cli/v2"
 )
