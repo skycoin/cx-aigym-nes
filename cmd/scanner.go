@@ -93,7 +93,7 @@ func scanner(filename string, inputInteger int64) {
 				value64 |= int64(data[i-1]) << 48
 				value64 |= int64(data[i]) << 54
 
-				if int64(inputInteger) > 0 && value64 == int64(inputInteger) {
+				if value64 == int64(inputInteger) {
 					fmt.Printf("Int64,%v,byte offset=%v\n", value64, i-7)
 					found = true
 				}
@@ -108,7 +108,7 @@ func scanner(filename string, inputInteger int64) {
 				value32 |= int32(data[i-1]) << 16
 				value32 |= int32(data[i]) << 24
 
-				if int32(inputInteger) > 0 && value32 == int32(inputInteger) {
+				if value32 == int32(inputInteger) {
 					fmt.Printf("Int32,%v,byte offset=%v\n", value32, i-3)
 					found = true
 				}
@@ -121,7 +121,7 @@ func scanner(filename string, inputInteger int64) {
 				value16 |= int16(data[i-1])
 				value16 |= int16(data[i]) << 8
 
-				if int16(inputInteger) > 0 && value16 == int16(inputInteger) {
+				if value16 == int16(inputInteger) {
 					fmt.Printf("Int16,%v,byte offset=%v\n", value16, i-1)
 					found = true
 				}
