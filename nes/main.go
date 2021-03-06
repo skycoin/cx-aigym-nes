@@ -85,10 +85,6 @@ func runUI(path, fileType string) error {
 		os.Exit(1)
 	}
 
-	if true {
-		cmd.Inject()
-	}
-
 	signalChan := make(chan os.Signal, 1)
 	paths := []string{path}
 	runtime.LockOSThread()
