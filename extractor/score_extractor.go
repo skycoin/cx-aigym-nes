@@ -80,11 +80,14 @@ func ExtractBomberman(ram []byte) Bomberman {
 // ----------------------------------------------------------------------------
 // Link Ram Map Table: https://datacrystal.romhacking.net/wiki/Donkey_Kong:RAM_map
 // ----------------------------------------------------------------------------
-// Address | Information
-// 0x0404  | Player 1 Marios remaining
-// 0x0405  | Player 2 Marios remaining
-// 0x0402  | Level number for player 1
-// 0x0403  | Level number for player 2
+// Address        | Information
+// 0x0404         | Player 1 Marios remaining
+// 0x0405         | Player 2 Marios remaining
+// 0x0402         | Level number for player 1
+// 0x0403         | Level number for player 2
+// TODO: add scores for P1 and P2
+// 0X0025-0X0027  | 6 digit 1P Score using BCD	1 nybble(4 bits) per digit
+// 0X0029-0X002B  | 6 digit 2P Score using BCD	1 nybble(4 bits) per digit
 // ----------------------------------------------------------------------------
 func ExtractDonkeyKong(ram []byte) DonkeyKong {
 	return DonkeyKong{
