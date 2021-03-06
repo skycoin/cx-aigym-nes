@@ -12,6 +12,6 @@ Note: All are in little endian.
 ### Example
    go run scanner.go -i=50 -f=../checkpoints/1614939776.ram  
 
-1. If no arguments are specified, the program will look return an error
+1. If no arguments are specified, the program will return an error
 
 3. If the integer value and file value are specified, the program will run scanner.
