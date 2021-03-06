@@ -129,3 +129,33 @@ func TestScoreExtractor_SuperMarioBros(t *testing.T) {
 		})
 	}
 }
+
+func TestScoreExtractor_Bomberman(t *testing.T) {
+	tests := []struct {
+		scenario string
+		filename string
+		want     Bomberman
+	}{
+		{
+			scenario: "Bomberman",
+			filename: "./checkpoints_test_data/1615047878.ram",
+			want: Bomberman{
+				Lives: 2,
+				Level: 1,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.scenario, func(t *testing.T) {
+			got := ExtractBomberman(Reader(t, tc.filename))
+
+			if tc.want.Lives != got.Lives {
+				t.Errorf("want lives %v, got %v", tc.want.Lives, got.Lives)
+			}
+			if tc.want.Level != got.Level {
+				t.Errorf("want level %v, got %v", tc.want.Level, got.Level)
+			}
+		})
+	}
+}
