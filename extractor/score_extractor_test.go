@@ -159,3 +159,41 @@ func TestScoreExtractor_Bomberman(t *testing.T) {
 		})
 	}
 }
+
+func TestScoreExtractor_DonkeyKong(t *testing.T) {
+	tests := []struct {
+		scenario string
+		filename string
+		want     DonkeyKong
+	}{
+		{
+			scenario: "DonkeyKong",
+			filename: "./checkpoints_test_data/1615048176.ram",
+			want: DonkeyKong{
+				LivesPlayerOne: 2,
+				LevelPlayerOne: 0,
+				LivesPlayerTwo: 3,
+				LevelPlayerTwo: 0,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.scenario, func(t *testing.T) {
+			got := ExtractDonkeyKong(Reader(t, tc.filename))
+
+			if tc.want.LivesPlayerOne != got.LivesPlayerOne {
+				t.Errorf("want lives player one %v, got %v", tc.want.LivesPlayerOne, got.LivesPlayerOne)
+			}
+			if tc.want.LevelPlayerOne != got.LevelPlayerOne {
+				t.Errorf("want level player one %v, got %v", tc.want.LevelPlayerOne, got.LevelPlayerOne)
+			}
+			if tc.want.LivesPlayerTwo != got.LivesPlayerTwo {
+				t.Errorf("want lives player two %v, got %v", tc.want.LivesPlayerTwo, got.LivesPlayerTwo)
+			}
+			if tc.want.LevelPlayerTwo != got.LevelPlayerTwo {
+				t.Errorf("want level player two %v, got %v", tc.want.LevelPlayerTwo, got.LevelPlayerTwo)
+			}
+		})
+	}
+}
