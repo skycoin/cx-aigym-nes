@@ -83,7 +83,7 @@ func scanner(filename string, inputInteger int64) {
 	for i := range data {
 		// Finding match for int64 values
 		if inputInteger <= maxInt64 && inputInteger >= minInt64 {
-			if (i+1)%8 == 0 {
+			if i >= 7 {
 				value64 |= int64(data[i-7])
 				value64 |= int64(data[i-6]) << 8
 				value64 |= int64(data[i-5]) << 16
@@ -102,7 +102,7 @@ func scanner(filename string, inputInteger int64) {
 
 		// Finding match for int32 values
 		if inputInteger <= maxInt32 && inputInteger >= minInt32 {
-			if (i+1)%4 == 0 {
+			if i >= 3 {
 				value32 |= int32(data[i-3])
 				value32 |= int32(data[i-2]) << 8
 				value32 |= int32(data[i-1]) << 16
@@ -117,7 +117,7 @@ func scanner(filename string, inputInteger int64) {
 
 		// Finding match for int16 values
 		if inputInteger <= maxInt16 && inputInteger >= minInt16 {
-			if (i+1)%2 == 0 {
+			if i >= 1 {
 				value16 |= int16(data[i-1])
 				value16 |= int16(data[i]) << 8
 
