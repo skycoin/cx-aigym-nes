@@ -76,3 +76,45 @@ func TestScoreExtractor_Tetris(t *testing.T) {
 		})
 	}
 }
+
+func TestScoreExtractor_SuperMarioBros(t *testing.T) {
+	tests := []struct {
+		scenario string
+		filename string
+		want     SuperMarioBros
+	}{
+		{
+			scenario: "Super Mario Bros",
+			filename: "./checkpoints_test_data/1615043111.ram",
+			want: SuperMarioBros{
+				Lives:      1,
+				World:      2,
+				Level:      2,
+				MarioScore: 43750,
+				LuigiScore: 0,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.scenario, func(t *testing.T) {
+			got := ExtractSuperMarioBros(Reader(t, tc.filename))
+
+			if tc.want.Lives != got.Lives {
+				t.Errorf("want lives %v, got %v", tc.want.Lives, got.Lives)
+			}
+			if tc.want.World != got.World {
+				t.Errorf("want world %v, got %v", tc.want.World, got.World)
+			}
+			if tc.want.Level != got.Level {
+				t.Errorf("want level %v, got %v", tc.want.Level, got.Level)
+			}
+			if tc.want.MarioScore != got.MarioScore {
+				t.Errorf("want mario score %v, got %v", tc.want.MarioScore, got.MarioScore)
+			}
+			if tc.want.LuigiScore != got.LuigiScore {
+				t.Errorf("want luigi score %v, got %v", tc.want.LuigiScore, got.LuigiScore)
+			}
+		})
+	}
+}
