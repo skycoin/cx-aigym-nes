@@ -9,14 +9,16 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/skycoin/cx-aigym-nes/nes/nes"
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	log "github.com/sirupsen/logrus"
+	"github.com/skycoin/cx-aigym-nes/nes/nes"
 )
 
 const padding = 0
 const PATH_CHECKPOINTS = "../checkpoints"
+
+var currentGameView *GameView
 
 type GameView struct {
 	director   *Director
@@ -40,7 +42,7 @@ func NewGameView(director *Director, console *nes.Console, path string, hash str
 	}
 
 	name := filepath.Base(path)
-	return &GameView{
+	currentGameView = &GameView{
 		director:   director,
 		console:    console,
 		RomName:    name,
@@ -51,6 +53,8 @@ func NewGameView(director *Director, console *nes.Console, path string, hash str
 		record:     true,
 		frames:     nil,
 	}
+
+	return currentGameView
 }
 
 func (view *GameView) Enter() {
@@ -257,4 +261,20 @@ func updateControllers(director *Director, console *nes.Console) {
 
 	console.SetButtons1(combineButtons(k1, j1))
 	console.SetButtons2(j2)
+}
+
+func GetRomFilename() string {
+	if currentGameView == nil || currentGameView.RomName == "" {
+		log.Panic("no rom is loaded")
+	}
+
+	return currentGameView.RomName
+}
+
+func GetRomHash() string {
+	if currentGameView == nil || currentGameView.RomName == "" {
+		log.Panic("no rom is loaded")
+	}
+
+	return currentGameView.RomHash
 }
