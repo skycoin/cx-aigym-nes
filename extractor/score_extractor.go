@@ -111,8 +111,8 @@ func ExtractSuperMarioBros(ram []byte) SuperMarioBros {
 		lvl = 1
 	}
 
-	MScore := int64(ram[0x07DD+offset])<<40 | int64(ram[(0x07DE)+offset])<<32 | int64(ram[0x07DF+offset])<<24 | int64(ram[0x07E0+offset])<<16 | int64(ram[0x07E1+offset])<<8 | int64(ram[0x07E2+offset])
-	LScore := int64(ram[0x07D3+offset])<<40 | int64(ram[(0x07D4)+offset])<<32 | int64(ram[0x07D5+offset])<<24 | int64(ram[0x07D6+offset])<<16 | int64(ram[0x07D7+offset])<<8 | int64(ram[0x07D8+offset])
+	MScore := (int64(ram[0x07DD+offset]) * 1000000) + (int64(ram[(0x07DE)+offset]) * 100000) + (int64(ram[0x07DF+offset]) * 10000) + (int64(ram[0x07E0+offset]) * 1000) + (int64(ram[0x07E1+offset]) * 100) + (int64(ram[0x07E2+offset]) * 10)
+	LScore := (int64(ram[0x07D3+offset]) * 1000000) + (int64(ram[(0x07D4)+offset]) * 100000) + (int64(ram[0x07D5+offset]) * 10000) + (int64(ram[0x07D6+offset]) * 1000) + (int64(ram[0x07D7+offset]) * 100) + (int64(ram[0x07D8+offset]) * 10)
 
 	return SuperMarioBros{
 		World:      int64(ram[0x075F+offset] + 1),
