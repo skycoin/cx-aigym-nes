@@ -174,13 +174,13 @@ func (d *Director) PlayGame(path string) {
 		log.Fatalln(err)
 	}
 
-	log.Infof("rom hash = %s", hash)
+	log.Infof("rom hash = %s", encodeToBase64(hash))
 	console, err := nes.NewConsole(path)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	d.SetView(NewGameView(d, console, path, hash))
+	d.SetView(NewGameView(d, console, path, string(hash)))
 }
 
 func (d *Director) ShowMenu() {

@@ -19,9 +19,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/skycoin/cx-aigym-nes/nes/nes"
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
+	"github.com/skycoin/cx-aigym-nes/nes/nes"
 )
 
 var homeDir string
@@ -153,14 +153,18 @@ func combineButtons(a, b [8]bool) [8]bool {
 	return result
 }
 
-func hashFile(path string) (string, error) {
+func hashFile(path string) ([]byte, error) {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	h := sha256.Sum256(data)
-	return base64.StdEncoding.EncodeToString(h[:]), nil
+	return h[:], nil
+}
+
+func encodeToBase64(h []byte) string {
+	return base64.StdEncoding.EncodeToString(h[:])
 }
 
 func createTexture() uint32 {
