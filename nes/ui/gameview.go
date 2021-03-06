@@ -9,14 +9,22 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/skycoin/cx-aigym-nes/nes/nes"
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	log "github.com/sirupsen/logrus"
+	"github.com/skycoin/cx-aigym-nes/nes/nes"
 )
 
 const padding = 0
 const PATH_CHECKPOINTS = "../checkpoints"
+
+type KeyReader func(window *glfw.Window, turbo bool) [8]bool
+
+var ReadKeys KeyReader
+
+func init() {
+	ReadKeys = readKeys
+}
 
 type GameView struct {
 	director   *Director
@@ -244,11 +252,13 @@ func updateControllers(director *Director, console *nes.Console) {
 
 	var j1, j2, k1 [8]bool
 
-	if director.glDisabled || director.randomKeys {
-		k1 = readRandomKeys()
-	} else {
-		k1 = readKeys(director.window, turbo)
-	}
+	k1 = ReadKeys(director.window, turbo)
+
+	// if director.glDisabled || director.randomKeys {
+	// 	k1 = readRandomKeys()
+	// } else {
+	// 	k1 = readKeys(director.window, turbo)
+	// }
 
 	if !director.glDisabled {
 		j1 = readJoystick(glfw.Joystick1, turbo)
