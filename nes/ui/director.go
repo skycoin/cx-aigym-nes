@@ -5,10 +5,10 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/skycoin/cx-aigym-nes/nes/nes"
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	log "github.com/sirupsen/logrus"
+	"github.com/skycoin/cx-aigym-nes/nes/nes"
 )
 
 type View interface {
@@ -167,6 +167,7 @@ func inputControl() <-chan string {
 	return ch
 }
 
+//https://github.com/skycoin/cx-aigym-nes/issues/23
 func (d *Director) PlayGame(path string) {
 	hash, err := hashFile(path)
 	if err != nil {
