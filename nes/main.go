@@ -38,10 +38,11 @@ Options:
 */
 func main() {
 	var (
-		romPath      string
-		jsonPath     string
-		disableAudio bool
-		disableVideo bool
+		romPath       string
+		jsonPath      string
+		savedirectory string
+		disableAudio  bool
+		disableVideo  bool
 	)
 
 	app := &cli.App{
@@ -57,6 +58,11 @@ func main() {
 				Name:        "disable-video",
 				Usage:       "disable video",
 				Destination: &disableVideo,
+			},
+			&cli.StringFlag{
+				Name:        "savedirectory",
+				Usage:       "Path to store the state of games",
+				Destination: &savedirectory,
 			},
 			&cli.StringFlag{
 				Name:        "loadrom",
@@ -75,9 +81,9 @@ func main() {
 		},
 		Action: func(c *cli.Context) error {
 			if romPath != "" {
-				return runUI(romPath, "rom", disableAudio, disableVideo)
+				return runUI(romPath, "rom", savedirectory, disableAudio, disableVideo)
 			} else if jsonPath != "" {
-				return runUI(jsonPath, "json", disableAudio, disableVideo)
+				return runUI(jsonPath, "json", savedirectory, disableAudio, disableVideo)
 			} else {
 				log.Error("No files specified or found")
 				os.Exit(1)
@@ -92,7 +98,8 @@ func main() {
 	}
 }
 
-func runUI(path, fileType string, disableAudio bool, disableVideo bool) error {
+func runUI(path, fileType string, savedirectory string,
+	disableAudio bool, disableVideo bool) error {
 	if path == "" {
 		log.Errorf("No %s files specified or found", fileType)
 		os.Exit(1)
@@ -101,7 +108,7 @@ func runUI(path, fileType string, disableAudio bool, disableVideo bool) error {
 	signalChan := make(chan os.Signal, 1)
 	paths := []string{path}
 	runtime.LockOSThread()
-	ui.Run(paths, signalChan, disableAudio, disableVideo)
+	ui.Run(paths, signalChan, savedirectory, disableAudio, disableVideo)
 
 	defer close(signalChan)
 	os.Exit(0)

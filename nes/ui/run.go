@@ -15,7 +15,8 @@ const (
 	title  = "NES"
 )
 
-func Run(paths []string, signalChan chan os.Signal, disableAudio bool, disableVideo bool) {
+func Run(paths []string, signalChan chan os.Signal,
+	savedirectory string, disableAudio bool, disableVideo bool) {
 	var (
 		randomKeys = false
 		window     *glfw.Window
@@ -61,7 +62,8 @@ func Run(paths []string, signalChan chan os.Signal, disableAudio bool, disableVi
 	}
 
 	// run director
-	director := NewDirector(window, audio, signalChan, disableVideo, disableAudio, randomKeys)
+	director := NewDirector(window, audio, signalChan, savedirectory,
+		disableVideo, disableAudio, randomKeys)
 	director.Start(paths)
 
 }

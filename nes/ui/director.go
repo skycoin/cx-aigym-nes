@@ -28,11 +28,13 @@ type Director struct {
 	randomKeys    bool
 	doneChan      chan int
 	signalChan    chan os.Signal
+	savedirectory string
 }
 
 func NewDirector(window *glfw.Window, audio *Audio,
-	signalChan chan os.Signal, glDisabled bool,
-	audioDisabled bool, randomKeys bool) *Director {
+	signalChan chan os.Signal, savedirectory string,
+	glDisabled bool, audioDisabled bool,
+	randomKeys bool) *Director {
 	director := Director{}
 	director.window = window
 	director.audio = audio
@@ -40,6 +42,7 @@ func NewDirector(window *glfw.Window, audio *Audio,
 	director.audioDisabled = audioDisabled
 	director.randomKeys = randomKeys
 	director.signalChan = signalChan
+	director.savedirectory = savedirectory
 	return &director
 }
 
