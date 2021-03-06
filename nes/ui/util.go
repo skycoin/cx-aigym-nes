@@ -19,9 +19,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/skycoin/cx-aigym-nes/nes/nes"
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
+	"github.com/skycoin/cx-aigym-nes/nes/nes"
 )
 
 var homeDir string
@@ -160,7 +160,11 @@ func hashFile(path string) (string, error) {
 	}
 
 	h := sha256.Sum256(data)
-	return base64.StdEncoding.EncodeToString(h[:]), nil
+	return string(h[:]), nil
+}
+
+func encodeToBase64(h []byte) string {
+	return base64.StdEncoding.EncodeToString(h[:])
 }
 
 func createTexture() uint32 {

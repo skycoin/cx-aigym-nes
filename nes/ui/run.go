@@ -15,16 +15,15 @@ const (
 	title  = "NES"
 )
 
-func Run(paths []string, signalChan chan os.Signal) {
+func Run(paths []string, signalChan chan os.Signal,
+	savedirectory string, disableAudio bool, disableVideo bool) {
 	var (
-		glDisabled    = false
-		audioDisabled = false
-		randomKeys    = false
-		window        *glfw.Window
-		audio         *Audio
+		randomKeys = false
+		window     *glfw.Window
+		audio      *Audio
 	)
 
-	if !audioDisabled {
+	if !disableAudio {
 		// initialize audio
 		portaudio.Initialize()
 		defer portaudio.Terminate()
@@ -36,7 +35,7 @@ func Run(paths []string, signalChan chan os.Signal) {
 		defer audio.Stop()
 	}
 
-	if !glDisabled {
+	if !disableVideo {
 
 		// initialize glfw
 		if err := glfw.Init(); err != nil {
@@ -63,7 +62,8 @@ func Run(paths []string, signalChan chan os.Signal) {
 	}
 
 	// run director
-	director := NewDirector(window, audio, signalChan, glDisabled, audioDisabled, randomKeys)
+	director := NewDirector(window, audio, signalChan, savedirectory,
+		disableVideo, disableAudio, randomKeys)
 	director.Start(paths)
 
 }
