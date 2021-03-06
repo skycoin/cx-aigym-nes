@@ -5,6 +5,9 @@ import (
 	"io/ioutil"
 	"os"
 	"strconv"
+
+	log "github.com/sirupsen/logrus"
+	"github.com/urfave/cli/v2"
 )
 
 func check(e error) {
@@ -14,22 +17,60 @@ func check(e error) {
 }
 
 func main() {
+	var inputString string
+	var inputInteger int64
+	var filename string
+
+	scannerApp := &cli.App{
+		Name:    "Scanner",
+		Version: "1.0.0",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:        "integer",
+				Value:       "",
+				Aliases:     []string{"i"},
+				Usage:       "Value to seek from .rom file",
+				Destination: &inputString,
+			},
+			&cli.StringFlag{
+				Name:        "filename",
+				Value:       "",
+				Aliases:     []string{"f", "file"},
+				Usage:       ".rom file to scan",
+				Destination: &filename,
+			},
+		},
+		Action: func(c *cli.Context) error {
+			if inputString != "" && filename != "" {
+				inputInteger, _ = strconv.ParseInt(inputString, 10, 64)
+				scanner(filename, inputInteger)
+			} else {
+				log.Error("No files specified or found")
+				os.Exit(1)
+			}
+			return nil
+		},
+	}
+
+	err := scannerApp.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func scanner(filename string, inputInteger int64) {
 	var value8 int8
 	var value16 int16
 	var value32 int32
 	var value64 int64
-	var inputInteger int64
 	var found bool
 
-	input := os.Getenv("integer")
-	inputInteger, _ = strconv.ParseInt(input, 10, 64)
-
-	filename := os.Getenv("file")
 	data, err := ioutil.ReadFile(filename)
 	check(err)
 
 	fmt.Printf("Filename: %v\n", filename)
-	for i, _ := range data {
+	for i := range data {
+		// Finding match for int64 values
 		if (i+1)%8 == 0 {
 			value64 |= int64(data[i-7])
 			value64 |= int64(data[i-6]) << 8
@@ -46,6 +87,7 @@ func main() {
 			}
 		}
 
+		// Finding match for int32 values
 		if (i+1)%4 == 0 {
 			value32 |= int32(data[i-3])
 			value32 |= int32(data[i-2]) << 8
@@ -58,6 +100,7 @@ func main() {
 			}
 		}
 
+		// Finding match for int16 values
 		if (i+1)%2 == 0 {
 			value16 |= int16(data[i-1])
 			value16 |= int16(data[i]) << 8
@@ -68,9 +111,10 @@ func main() {
 			}
 		}
 
+		// Finding match for int8 values
 		value8 = int8(data[i])
 		if int8(inputInteger) > 0 && value8 == int8(inputInteger) {
-			fmt.Printf("Type=Int8,%v,byte offset=%v\n", value8, i)
+			fmt.Printf("Int8,%v,byte offset=%v\n", value8, i)
 			found = true
 		}
 	}
