@@ -1,5 +1,11 @@
 package score_extractor
 
+import (
+	"encoding/hex"
+	"errors"
+	"strconv"
+)
+
 const (
 	offset = 8 // address offset based on save file
 )
@@ -130,12 +136,32 @@ func ExtractTetris(ram []byte) Tetris {
 	score_two := ram[0x0054+offset]
 	score_three := ram[0x0055+offset]
 
-	score |= int64(score_one)
-	score |= int64(score_two) << 8
-	score |= int64(score_three) << 16
+	score, err := decodeBcd([]byte{score_three, score_two, score_one})
+	if err != nil {
+		panic(err)
+	}
 
 	return Tetris{
 		Score: score,
 		Level: int64(ram[0x0044+offset]),
+	}
+}
+
+func decodeBcd(bcd []byte) (int64, error) {
+	s := hex.EncodeToString(bcd)
+	if s[len(s)-1] == 'f' {
+		s = s[:len(s)-1]
+	}
+	result, err := strconv.ParseUint(s, 10, 64)
+	if err == nil {
+		return int64(result), nil
+	}
+	switch err.(*strconv.NumError).Err {
+	case strconv.ErrRange:
+		return 0, errors.New("Overflow occurred in BCD decoding")
+	case strconv.ErrSyntax:
+		return 0, errors.New("Bad digit in BCD decoding")
+	default:
+		panic("unexpected error from strconv.ParseUint")
 	}
 }
