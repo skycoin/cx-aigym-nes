@@ -5,6 +5,7 @@ import (
 	"runtime"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/skycoin/cx-aigym-nes/nes/cmd"
 	"github.com/skycoin/cx-aigym-nes/nes/ui"
 	"github.com/urfave/cli/v2"
 )
@@ -82,6 +83,10 @@ func runUI(path, fileType string) error {
 	if path == "" {
 		log.Errorf("No %s files specified or found", fileType)
 		os.Exit(1)
+	}
+
+	if true {
+		cmd.Inject()
 	}
 
 	signalChan := make(chan os.Signal, 1)
