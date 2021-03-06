@@ -153,14 +153,14 @@ func combineButtons(a, b [8]bool) [8]bool {
 	return result
 }
 
-func hashFile(path string) ([]byte, error) {
+func hashFile(path string) (string, error) {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	h := sha256.Sum256(data)
-	return h[:], nil
+	return string(h[:]), nil
 }
 
 func encodeToBase64(h []byte) string {
