@@ -13,7 +13,7 @@ func TestScoreExtractor_Pacman(t *testing.T) {
 	}{
 		{
 			scenario: "Pacman",
-			filename: "../checkpoints/1615018620.ram",
+			filename: "./checkpoints_test_data/1615018620.ram",
 			want: Pacman{
 				Lives: 3,
 				Level: 1,
