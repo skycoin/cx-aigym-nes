@@ -26,6 +26,8 @@ type DonkeyKong struct {
 	LivesPlayerTwo int64 `json:"lives_player_two"`
 	LevelPlayerOne int64 `json:"level_player_one"`
 	LevelPlayerTwo int64 `json:"level_player_two"`
+	ScorePlayerOne int64 `json:"score_player_one"`
+	ScorePlayerTwo int64 `json:"score_player_two"`
 }
 
 type SuperMarioBros struct {
@@ -85,16 +87,42 @@ func ExtractBomberman(ram []byte) Bomberman {
 // 0x0405         | Player 2 Marios remaining
 // 0x0402         | Level number for player 1
 // 0x0403         | Level number for player 2
-// TODO: add scores for P1 and P2
 // 0X0025-0X0027  | 6 digit 1P Score using BCD	1 nybble(4 bits) per digit
 // 0X0029-0X002B  | 6 digit 2P Score using BCD	1 nybble(4 bits) per digit
 // ----------------------------------------------------------------------------
 func ExtractDonkeyKong(ram []byte) DonkeyKong {
+	P1Score_byte_one := ram[0X0025+offset]
+	P1Score_byte_two := ram[0X0026+offset]
+	P1Score_byte_three := ram[0X0027+offset]
+
+	P1Score_nibble_one := (P1Score_byte_one & 0xF0) >> 4
+	P1Score_nibble_two := P1Score_byte_one & 0xF
+	P1Score_nibble_three := (P1Score_byte_two & 0xF0) >> 4
+	P1Score_nibble_four := P1Score_byte_two & 0xF
+	P1Score_nibble_five := (P1Score_byte_three & 0xF0) >> 4
+	P1Score_nibble_six := P1Score_byte_three & 0xF
+
+	P2Score_byte_one := ram[0X0029+offset]
+	P2Score_byte_two := ram[0X002A+offset]
+	P2Score_byte_three := ram[0X002B+offset]
+
+	P2Score_nibble_one := (P2Score_byte_one & 0xF0) >> 4
+	P2Score_nibble_two := P2Score_byte_one & 0xF
+	P2Score_nibble_three := (P2Score_byte_two & 0xF0) >> 4
+	P2Score_nibble_four := P2Score_byte_two & 0xF
+	P2Score_nibble_five := (P2Score_byte_three & 0xF0) >> 4
+	P2Score_nibble_six := P2Score_byte_three & 0xF
+
+	P1Score := (int64(P1Score_nibble_one) * 100000) + (int64(P1Score_nibble_two) * 10000) + (int64(P1Score_nibble_three) * 1000) + (int64(P1Score_nibble_four) * 100) + (int64(P1Score_nibble_five) * 10) + (int64(P1Score_nibble_six))
+	P2Score := (int64(P2Score_nibble_one) * 100000) + (int64(P2Score_nibble_two) * 10000) + (int64(P2Score_nibble_three) * 1000) + (int64(P2Score_nibble_four) * 100) + (int64(P2Score_nibble_five) * 10) + (int64(P2Score_nibble_six))
+
 	return DonkeyKong{
 		LivesPlayerOne: int64(ram[0x0404+offset]),
 		LivesPlayerTwo: int64(ram[0x0405+offset]),
 		LevelPlayerOne: int64(ram[0x0402+offset]),
 		LevelPlayerTwo: int64(ram[0x0403+offset]),
+		ScorePlayerOne: P1Score,
+		ScorePlayerTwo: P2Score,
 	}
 }
 
