@@ -174,6 +174,8 @@ func TestScoreExtractor_DonkeyKong(t *testing.T) {
 				LevelPlayerOne: 0,
 				LivesPlayerTwo: 3,
 				LevelPlayerTwo: 0,
+				ScorePlayerOne: 5400,
+				ScorePlayerTwo: 0,
 			},
 		},
 	}
@@ -193,6 +195,12 @@ func TestScoreExtractor_DonkeyKong(t *testing.T) {
 			}
 			if tc.want.LevelPlayerTwo != got.LevelPlayerTwo {
 				t.Errorf("want level player two %v, got %v", tc.want.LevelPlayerTwo, got.LevelPlayerTwo)
+			}
+			if tc.want.ScorePlayerOne != got.ScorePlayerOne {
+				t.Errorf("want score player one %v, got %v", tc.want.ScorePlayerOne, got.ScorePlayerOne)
+			}
+			if tc.want.ScorePlayerTwo != got.ScorePlayerTwo {
+				t.Errorf("want score player two %v, got %v", tc.want.ScorePlayerTwo, got.ScorePlayerTwo)
 			}
 		})
 	}
