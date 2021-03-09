@@ -1,8 +1,18 @@
 package score_extractor
 
+import "fmt"
+
 const (
 	offset = 8 // address offset based on save file
 )
+
+var RomHashMap = map[string]string{
+	"Tlfwh1Si/37HiCRWKftw+Z1OAD9m+GdCVmvKmcgQokQ=": "bomberman",
+	"ETZFOAnlaBMYuBFa0jt/dpp62h+GSAkPwAbDnP6A2mE=": "donkeykong",
+	"B0U4hfMsdlEl7cPyNQpECdzRWTbjbXMwNdxJWd38HiM=": "mario",
+	"1enE6B/3MW1NixXyGYRxYG/bcouM2dqSsVO9xFEktWU=": "pacman",
+	"rKsQ8tutTU711WsxzUzqIIu24uLF26XrM51xHsBONTU=": "tetris",
+}
 
 type Pacman struct {
 	Lives int64 `json:"lives"`
@@ -35,6 +45,24 @@ type SuperMarioBros struct {
 type Tetris struct {
 	Score int64 `json:"score"`
 	Level int64 `json:"level"`
+}
+
+func ExtractGameDetails(romHash string, ram []byte) {
+	switch RomHashMap[romHash] {
+	case "bomberman":
+		ExtractBomberman(ram)
+	case "donkeykong":
+		ExtractDonkeyKong(ram)
+	case "mario":
+		ExtractSuperMarioBros(ram)
+	case "pacman":
+		ExtractPacman(ram)
+	case "tetris":
+		ExtractTetris(ram)
+	default:
+		fmt.Printf("rom hash cannot be found")
+
+	}
 }
 
 // ----------------------------------------------------------------------------
