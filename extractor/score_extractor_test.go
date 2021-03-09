@@ -1,17 +1,8 @@
 package score_extractor
 
 import (
-	"io/ioutil"
 	"testing"
 )
-
-func Reader(t *testing.T, filename string) []byte {
-	data, err := ioutil.ReadFile(filename)
-	if err != nil {
-		t.Fatalf("error reading file: %v", err)
-	}
-	return data
-}
 
 func TestScoreExtractor_Pacman(t *testing.T) {
 	tests := []struct {
@@ -32,7 +23,7 @@ func TestScoreExtractor_Pacman(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.scenario, func(t *testing.T) {
-			got := ExtractPacman(Reader(t, tc.filename))
+			got := ExtractPacman(Reader(tc.filename))
 
 			if tc.want.Lives != got.Lives {
 				t.Errorf("want lives %v, got %v", tc.want.Lives, got.Lives)
@@ -65,7 +56,7 @@ func TestScoreExtractor_Tetris(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.scenario, func(t *testing.T) {
-			got := ExtractTetris(Reader(t, tc.filename))
+			got := ExtractTetris(Reader(tc.filename))
 
 			if tc.want.Level != got.Level {
 				t.Errorf("want level %v, got %v", tc.want.Level, got.Level)
@@ -109,7 +100,7 @@ func TestScoreExtractor_SuperMarioBros(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.scenario, func(t *testing.T) {
-			got := ExtractSuperMarioBros(Reader(t, tc.filename))
+			got := ExtractSuperMarioBros(Reader(tc.filename))
 
 			if tc.want.Lives != got.Lives {
 				t.Errorf("want lives %v, got %v", tc.want.Lives, got.Lives)
@@ -148,7 +139,7 @@ func TestScoreExtractor_Bomberman(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.scenario, func(t *testing.T) {
-			got := ExtractBomberman(Reader(t, tc.filename))
+			got := ExtractBomberman(Reader(tc.filename))
 
 			if tc.want.Lives != got.Lives {
 				t.Errorf("want lives %v, got %v", tc.want.Lives, got.Lives)
@@ -182,7 +173,7 @@ func TestScoreExtractor_DonkeyKong(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.scenario, func(t *testing.T) {
-			got := ExtractDonkeyKong(Reader(t, tc.filename))
+			got := ExtractDonkeyKong(Reader(tc.filename))
 
 			if tc.want.LivesPlayerOne != got.LivesPlayerOne {
 				t.Errorf("want lives player one %v, got %v", tc.want.LivesPlayerOne, got.LivesPlayerOne)

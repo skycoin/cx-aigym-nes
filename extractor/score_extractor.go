@@ -1,6 +1,13 @@
 package score_extractor
 
-import "fmt"
+import (
+	"fmt"
+	"io/ioutil"
+	"os"
+
+	log "github.com/sirupsen/logrus"
+	"github.com/urfave/cli/v2"
+)
 
 var (
 	offset = 8 // address offset based on save file
@@ -203,4 +210,68 @@ func get6BCDFrom3Bytes(bytes []byte) int64 {
 // get7BCDFrom6Bytes returns the 7 digit BCD value from 6 bytes
 func get7BCDFrom6Bytes(bytes []byte) int64 {
 	return (int64(bytes[0]) * 1000000) + (int64(bytes[1]) * 100000) + (int64(bytes[2]) * 10000) + (int64(bytes[3]) * 1000) + (int64(bytes[4]) * 100) + (int64(bytes[5]) * 10)
+}
+
+func main() {
+	var gameName string
+	var filename string
+
+	extractorApp := &cli.App{
+		Name:    "Score Extractor",
+		Version: "1.0.0",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:        "Game",
+				Value:       "",
+				Aliases:     []string{"g"},
+				Usage:       "Name of the game",
+				Destination: &gameName,
+			},
+			&cli.StringFlag{
+				Name:        "filename",
+				Value:       "",
+				Aliases:     []string{"f", "file"},
+				Usage:       ".rom file to scan",
+				Destination: &filename,
+			},
+		},
+		Action: func(c *cli.Context) error {
+			if gameName != "" && filename != "" {
+				gameExtractorFromFile(filename, gameName)
+			} else {
+				log.Error("No files specified or found")
+				os.Exit(1)
+			}
+			return nil
+		},
+	}
+
+	err := extractorApp.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func gameExtractorFromFile(filename, game string) {
+	fmt.Printf("Game: %v\nFilename: %v\n", game, filename)
+	switch game {
+	case "bomberman":
+		fmt.Printf("%+v\n", ExtractBomberman(Reader(filename)))
+	case "donkeykong":
+		fmt.Printf("%+v\n", ExtractDonkeyKong(Reader(filename)))
+	case "mario":
+		fmt.Printf("%+v\n", ExtractSuperMarioBros(Reader(filename)))
+	case "pacman":
+		fmt.Printf("%+v\n", ExtractPacman(Reader(filename)))
+	case "tetris":
+		fmt.Printf("%+v\n", ExtractTetris(Reader(filename)))
+	}
+}
+
+func Reader(filename string) []byte {
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		panic("error reading file")
+	}
+	return data
 }
