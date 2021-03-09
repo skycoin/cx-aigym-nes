@@ -2,7 +2,7 @@ package score_extractor
 
 import "fmt"
 
-const (
+var (
 	offset = 8 // address offset based on save file
 )
 
@@ -48,20 +48,20 @@ type Tetris struct {
 }
 
 func ExtractGameDetails(romHash string, ram []byte) {
+	offset = 0 // Offset is zero when directly from the game, not a save file
 	switch RomHashMap[romHash] {
 	case "bomberman":
-		fmt.Printf("%v", ExtractBomberman(ram))
+		fmt.Printf("%+v\n", ExtractBomberman(ram))
 	case "donkeykong":
-		fmt.Printf("%v", ExtractDonkeyKong(ram))
+		fmt.Printf("%+v\n", ExtractDonkeyKong(ram))
 	case "mario":
-		fmt.Printf("%v", ExtractSuperMarioBros(ram))
+		fmt.Printf("%+v\n", ExtractSuperMarioBros(ram))
 	case "pacman":
-		fmt.Printf("%v", ExtractPacman(ram))
+		fmt.Printf("%+v\n", ExtractPacman(ram))
 	case "tetris":
-		fmt.Printf("%v", ExtractTetris(ram))
+		fmt.Printf("%+v\n", ExtractTetris(ram))
 	default:
 		fmt.Printf("rom hash cannot be found")
-
 	}
 }
 
