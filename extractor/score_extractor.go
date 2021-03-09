@@ -50,15 +50,15 @@ type Tetris struct {
 func ExtractGameDetails(romHash string, ram []byte) {
 	switch RomHashMap[romHash] {
 	case "bomberman":
-		ExtractBomberman(ram)
+		fmt.Println(ExtractBomberman(ram))
 	case "donkeykong":
-		ExtractDonkeyKong(ram)
+		fmt.Println(ExtractDonkeyKong(ram))
 	case "mario":
-		ExtractSuperMarioBros(ram)
+		fmt.Println(ExtractSuperMarioBros(ram))
 	case "pacman":
-		ExtractPacman(ram)
+		fmt.Println(ExtractPacman(ram))
 	case "tetris":
-		ExtractTetris(ram)
+		fmt.Println(ExtractTetris(ram))
 	default:
 		fmt.Printf("rom hash cannot be found")
 
