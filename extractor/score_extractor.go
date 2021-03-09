@@ -49,6 +49,8 @@ type Tetris struct {
 
 func ExtractGameDetails(romHash string, ram []byte) {
 	offset = 0 // Offset is zero when directly from the game, not a save file
+
+	fmt.Printf("RomHash: %v\nRomName: %v\n", romHash, RomHashMap[romHash])
 	switch RomHashMap[romHash] {
 	case "bomberman":
 		fmt.Printf("%+v\n", ExtractBomberman(ram))
