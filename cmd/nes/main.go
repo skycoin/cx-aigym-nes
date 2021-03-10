@@ -5,7 +5,7 @@ import (
 	"runtime"
 
 	log "github.com/sirupsen/logrus"
-	_ "github.com/skycoin/cx-aigym-nes/cmd/rand"
+	"github.com/skycoin/cx-aigym-nes/cmd/rand"
 	"github.com/skycoin/cx-aigym-nes/nes/ui"
 	"github.com/urfave/cli/v2"
 )
@@ -22,8 +22,8 @@ cx-aigym-nes
 Play game from rom files.
 
 Usage:
-  cx-aigym-nes  loadrom  --file <romfile/s> [--range <range>...] [--verbose]
-  cx-aigym-nes  loadjson  --file <jsonfile/s> [--range <range>...] [--verbose]
+  cx-aigym-nes  loadrom  --file <romfile/s> [--range <range>...] [--verbose] --random <rand>
+  cx-aigym-nes  loadjson  --file <jsonfile/s> [--range <range>...] [--verbose] --random <rand>
   cx-aigym-nes  loadrom  --help
   cx-aigym-nes  loadjson --help
   cx-aigym-nes -h | --help
@@ -44,6 +44,7 @@ func main() {
 		savedirectory string
 		disableAudio  bool
 		disableVideo  bool
+		random        bool
 	)
 
 	app := &cli.App{
@@ -79,8 +80,18 @@ func main() {
 				Usage:       "load .json file/s",
 				Destination: &jsonPath,
 			},
+			&cli.BoolFlag{
+				Name:        "random",
+				Value:       false,
+				Aliases:     []string{"r"},
+				Usage:       "play random",
+				Destination: &random,
+			},
 		},
 		Action: func(c *cli.Context) error {
+			if random {
+				rand.Inject()
+			}
 			if romPath != "" {
 				return runUI(romPath, "rom", savedirectory, disableAudio, disableVideo)
 			} else if jsonPath != "" {
