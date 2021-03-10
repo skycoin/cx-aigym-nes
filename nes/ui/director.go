@@ -5,10 +5,10 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/skycoin/cx-aigym-nes/nes/nes"
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	log "github.com/sirupsen/logrus"
+	"github.com/skycoin/cx-aigym-nes/nes/nes"
 )
 
 type View interface {
@@ -28,11 +28,13 @@ type Director struct {
 	randomKeys    bool
 	doneChan      chan int
 	signalChan    chan os.Signal
+	savedirectory string
 }
 
 func NewDirector(window *glfw.Window, audio *Audio,
-	signalChan chan os.Signal, glDisabled bool,
-	audioDisabled bool, randomKeys bool) *Director {
+	signalChan chan os.Signal, savedirectory string,
+	glDisabled bool, audioDisabled bool,
+	randomKeys bool) *Director {
 	director := Director{}
 	director.window = window
 	director.audio = audio
@@ -40,6 +42,7 @@ func NewDirector(window *glfw.Window, audio *Audio,
 	director.audioDisabled = audioDisabled
 	director.randomKeys = randomKeys
 	director.signalChan = signalChan
+	director.savedirectory = savedirectory
 	return &director
 }
 
@@ -167,13 +170,14 @@ func inputControl() <-chan string {
 	return ch
 }
 
+//https://github.com/skycoin/cx-aigym-nes/issues/23
 func (d *Director) PlayGame(path string) {
 	hash, err := hashFile(path)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	log.Infof("rom hash = %s", hash)
+	log.Infof("rom hash = %s", encodeToBase64([]byte(hash)))
 	console, err := nes.NewConsole(path)
 	if err != nil {
 		log.Fatalln(err)

@@ -7,6 +7,7 @@ import (
 	"image"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/go-gl/gl/v2.1/gl"
@@ -18,6 +19,8 @@ import (
 
 const padding = 0
 const PATH_CHECKPOINTS = "../checkpoints"
+
+var currentGameView *GameView
 
 type GameView struct {
 	director   *Director
@@ -41,7 +44,7 @@ func NewGameView(director *Director, console *nes.Console, path string, hash str
 	}
 
 	name := filepath.Base(path)
-	return &GameView{
+	currentGameView = &GameView{
 		director:   director,
 		console:    console,
 		RomName:    name,
@@ -52,6 +55,8 @@ func NewGameView(director *Director, console *nes.Console, path string, hash str
 		record:     true,
 		frames:     nil,
 	}
+
+	return currentGameView
 }
 
 func (view *GameView) Enter() {
@@ -147,30 +152,36 @@ func (view *GameView) loadState() {
 	}
 }
 
-func (view *GameView) saveStateToFiles(now int64) error {
-	path := fmt.Sprintf("%s/%d.ram", PATH_CHECKPOINTS, now)
-	return view.console.SaveState(path)
+func (view *GameView) saveStateToFiles(saveDirectory string, now int64) error {
+	filepath := fmt.Sprintf("%s/%d.ram",
+		strings.TrimSuffix(saveDirectory, "/"), now)
+	return view.console.SaveState(filepath)
 }
 
-func (view *GameView) saveToJson(now int64) error {
+func (view *GameView) saveToJson(saveDirectory string, now int64) error {
 
 	view.StateHash = fmt.Sprintf("%x", sha256.Sum256(view.state))
-	file, err := json.MarshalIndent(view, "", " ")
+	data, err := json.MarshalIndent(view, "", " ")
 	if err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("%s/%d.json", PATH_CHECKPOINTS, now)
-	return ioutil.WriteFile(path, file, 0644)
+	filepath := fmt.Sprintf("%s/%d.json",
+		strings.TrimSuffix(saveDirectory, "/"), now)
+	return ioutil.WriteFile(filepath, data, 0644)
 }
 
 func (view *GameView) save() error {
-	log.Infof("save state of game to %s: %v", PATH_CHECKPOINTS, view)
-	now := time.Now().Unix()
-	view.Timestamp = now
-	view.saveStateToFiles(now)
-	view.saveScreenshot(now)
-	view.saveToJson(now)
+	saveDirectory := view.director.savedirectory
+	if saveDirectory == "" {
+		saveDirectory = PATH_CHECKPOINTS
+	}
+
+	log.Infof("save state of game to %s", saveDirectory)
+	view.Timestamp = time.Now().Unix()
+	view.saveStateToFiles(saveDirectory, view.Timestamp)
+	view.saveScreenshot(saveDirectory, view.Timestamp)
+	view.saveToJson(saveDirectory, view.Timestamp)
 	return nil
 }
 
@@ -210,9 +221,10 @@ func (view *GameView) onKey(window *glfw.Window,
 	}
 }
 
-func (view *GameView) saveScreenshot(now int64) error {
-	path := fmt.Sprintf("%s/%d.png", PATH_CHECKPOINTS, now)
-	return savePNG(path, view.console.Buffer())
+func (view *GameView) saveScreenshot(saveDirectory string, now int64) error {
+	filepath := fmt.Sprintf("%s/%d.png",
+		strings.TrimSuffix(saveDirectory, "/"), now)
+	return savePNG(filepath, view.console.Buffer())
 }
 
 func (view *GameView) captureImageFrame() *image.RGBA {
@@ -262,4 +274,21 @@ func updateControllers(director *Director, console *nes.Console) {
 
 	console.SetButtons1(combineButtons(k1, j1))
 	console.SetButtons2(j2)
+}
+
+//Implement "GetRomFilename"" And "GetRomHash()" #22
+func GetRomFilename() string {
+	if currentGameView == nil || currentGameView.RomName == "" {
+		log.Panic("no rom is loaded")
+	}
+
+	return currentGameView.RomName
+}
+
+func GetRomHash() string {
+	if currentGameView == nil || currentGameView.RomName == "" {
+		log.Panic("no rom is loaded")
+	}
+
+	return currentGameView.RomHash
 }
