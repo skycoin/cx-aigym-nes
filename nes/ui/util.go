@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"image"
 	"image/color"
@@ -160,7 +161,7 @@ func hashFile(path string) (string, error) {
 	}
 
 	h := sha256.Sum256(data)
-	return string(h[:]), nil
+	return hex.EncodeToString(h[:]), nil
 }
 
 func encodeToBase64(h []byte) string {
