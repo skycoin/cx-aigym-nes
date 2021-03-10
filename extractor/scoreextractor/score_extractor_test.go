@@ -1,4 +1,4 @@
-package score_extractor
+package scoreextractor
 
 import (
 	"testing"
