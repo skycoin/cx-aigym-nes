@@ -19,6 +19,14 @@ import (
 const padding = 0
 const PATH_CHECKPOINTS = "../checkpoints"
 
+type KeyReader func(window *glfw.Window, turbo bool) [8]bool
+
+var ReadKeys KeyReader
+
+func init() {
+	ReadKeys = readKeys
+}
+
 var currentGameView *GameView
 
 type GameView struct {
@@ -256,11 +264,13 @@ func updateControllers(director *Director, console *nes.Console) {
 
 	var j1, j2, k1 [8]bool
 
-	if director.glDisabled || director.randomKeys {
-		k1 = readRandomKeys()
-	} else {
-		k1 = readKeys(director.window, turbo)
-	}
+	k1 = ReadKeys(director.window, turbo)
+
+	// if director.glDisabled || director.randomKeys {
+	// 	k1 = readRandomKeys()
+	// } else {
+	// 	k1 = readKeys(director.window, turbo)
+	// }
 
 	if !director.glDisabled {
 		j1 = readJoystick(glfw.Joystick1, turbo)
