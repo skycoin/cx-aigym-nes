@@ -102,12 +102,12 @@ func (view *GameView) Exit() {
 	}
 
 	// save sram
-	cartridge := view.console.Cartridge
-	if cartridge.Battery != 0 {
-		writeSRAM(sramPath(view.RomHash), cartridge.SRAM)
-	}
-	// save state
-	view.console.SaveState(savePath(view.RomHash))
+	// cartridge := view.console.Cartridge
+	// if cartridge.Battery != 0 {
+	// 	writeSRAM(sramPath(view.RomHash), cartridge.SRAM)
+	// }
+	// // save state
+	// view.console.SaveState(savePath(view.RomHash))
 
 }
 
