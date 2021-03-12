@@ -13,7 +13,7 @@ import (
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	log "github.com/sirupsen/logrus"
-	extractor "github.com/skycoin/cx-aigym-nes/extractor"
+	extractor "github.com/skycoin/cx-aigym-nes/extractor/scoreextractor"
 	"github.com/skycoin/cx-aigym-nes/nes/nes"
 )
 
@@ -102,12 +102,12 @@ func (view *GameView) Exit() {
 	}
 
 	// save sram
-	cartridge := view.console.Cartridge
-	if cartridge.Battery != 0 {
-		writeSRAM(sramPath(view.RomHash), cartridge.SRAM)
-	}
-	// save state
-	view.console.SaveState(savePath(view.RomHash))
+	// cartridge := view.console.Cartridge
+	// if cartridge.Battery != 0 {
+	// 	writeSRAM(sramPath(view.RomHash), cartridge.SRAM)
+	// }
+	// // save state
+	// view.console.SaveState(savePath(view.RomHash))
 
 }
 
