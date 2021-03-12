@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"runtime"
 
@@ -52,6 +53,7 @@ func main() {
 		Name:    "cx-aigym-nes",
 		Version: "1.0.0",
 		Flags: []cli.Flag{
+
 			&cli.BoolFlag{
 				Name:        "disable-audio",
 				Usage:       "disable audio",
@@ -89,14 +91,15 @@ func main() {
 				Destination: &random,
 			},
 			&cli.Float64Flag{
-				Name:        "dt",
+				Name:        "step-seconds",
 				Value:       0.016,
-				Aliases:     []string{"d"},
+				Aliases:     []string{"ss"},
 				Usage:       "step seconds",
 				Destination: &dt,
 			},
 		},
 		Action: func(c *cli.Context) error {
+			fmt.Println("lsjkdlfj ***", dt)
 			if random {
 				rand.Inject()
 			}
