@@ -94,7 +94,7 @@ func main() {
 				Name:        "step-seconds",
 				Value:       0.016,
 				Aliases:     []string{"ss"},
-				Usage:       "step seconds",
+				Usage:       "step seconds (dt)",
 				Destination: &dt,
 			},
 		},
