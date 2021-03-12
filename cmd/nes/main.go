@@ -90,8 +90,8 @@ func main() {
 			},
 			&cli.Float64Flag{
 				Name:        "dt",
-				Value:       0.0,
-				Aliases:     []string{"dt"},
+				Value:       0.016,
+				Aliases:     []string{"d"},
 				Usage:       "step seconds",
 				Destination: &dt,
 			},
@@ -101,9 +101,9 @@ func main() {
 				rand.Inject()
 			}
 			if romPath != "" {
-				return runUI(romPath, "rom", savedirectory, disableAudio, disableVideo)
+				return runUI(romPath, "rom", savedirectory, disableAudio, disableVideo, dt)
 			} else if jsonPath != "" {
-				return runUI(jsonPath, "json", savedirectory, disableAudio, disableVideo)
+				return runUI(jsonPath, "json", savedirectory, disableAudio, disableVideo, dt)
 			} else {
 				log.Error("No files specified or found")
 				os.Exit(1)
@@ -119,7 +119,7 @@ func main() {
 }
 
 func runUI(path, fileType string, savedirectory string,
-	disableAudio bool, disableVideo bool) error {
+	disableAudio bool, disableVideo bool, dt float64) error {
 	if path == "" {
 		log.Errorf("No %s files specified or found", fileType)
 		os.Exit(1)
