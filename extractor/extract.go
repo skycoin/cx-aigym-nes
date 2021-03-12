@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	extractor "github.com/kenje4090/cx-aigym-nes/extractor/scoreextractor"
 	log "github.com/sirupsen/logrus"
+	extractor "github.com/skycoin/cx-aigym-nes/extractor/scoreextractor"
 	"github.com/urfave/cli/v2"
 )
 
