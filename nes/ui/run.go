@@ -1,11 +1,12 @@
 package ui
 
 import (
+	"log"
+	"os"
+
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/gordonklaus/portaudio"
-	"log"
-	"os"
 )
 
 const (
@@ -16,7 +17,7 @@ const (
 )
 
 func Run(paths []string, signalChan chan os.Signal,
-	savedirectory string, disableAudio bool, disableVideo bool) {
+	savedirectory string, disableAudio bool, disableVideo bool, dt float64) {
 	var (
 		randomKeys = false
 		window     *glfw.Window
@@ -63,7 +64,7 @@ func Run(paths []string, signalChan chan os.Signal,
 
 	// run director
 	director := NewDirector(window, audio, signalChan, savedirectory,
-		disableVideo, disableAudio, randomKeys)
+		disableVideo, disableAudio, randomKeys, dt)
 	director.Start(paths)
 
 }

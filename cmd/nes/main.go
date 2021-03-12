@@ -45,6 +45,7 @@ func main() {
 		disableAudio  bool
 		disableVideo  bool
 		random        bool
+		dt            float64
 	)
 
 	app := &cli.App{
@@ -87,15 +88,22 @@ func main() {
 				Usage:       "play random",
 				Destination: &random,
 			},
+			&cli.Float64Flag{
+				Name:        "dt",
+				Value:       0.016,
+				Aliases:     []string{"d"},
+				Usage:       "step seconds",
+				Destination: &dt,
+			},
 		},
 		Action: func(c *cli.Context) error {
 			if random {
 				rand.Inject()
 			}
 			if romPath != "" {
-				return runUI(romPath, "rom", savedirectory, disableAudio, disableVideo)
+				return runUI(romPath, "rom", savedirectory, disableAudio, disableVideo, dt)
 			} else if jsonPath != "" {
-				return runUI(jsonPath, "json", savedirectory, disableAudio, disableVideo)
+				return runUI(jsonPath, "json", savedirectory, disableAudio, disableVideo, dt)
 			} else {
 				log.Error("No files specified or found")
 				os.Exit(1)
@@ -111,7 +119,7 @@ func main() {
 }
 
 func runUI(path, fileType string, savedirectory string,
-	disableAudio bool, disableVideo bool) error {
+	disableAudio bool, disableVideo bool, dt float64) error {
 	if path == "" {
 		log.Errorf("No %s files specified or found", fileType)
 		os.Exit(1)
@@ -120,7 +128,7 @@ func runUI(path, fileType string, savedirectory string,
 	signalChan := make(chan os.Signal, 1)
 	paths := []string{path}
 	runtime.LockOSThread()
-	ui.Run(paths, signalChan, savedirectory, disableAudio, disableVideo)
+	ui.Run(paths, signalChan, savedirectory, disableAudio, disableVideo, dt)
 
 	defer close(signalChan)
 	os.Exit(0)
