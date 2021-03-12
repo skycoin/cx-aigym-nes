@@ -45,6 +45,7 @@ func main() {
 		disableAudio  bool
 		disableVideo  bool
 		random        bool
+		dt            float64
 	)
 
 	app := &cli.App{
@@ -87,6 +88,13 @@ func main() {
 				Usage:       "play random",
 				Destination: &random,
 			},
+			&cli.Float64Flag{
+				Name:        "dt",
+				Value:       0.0,
+				Aliases:     []string{"dt"},
+				Usage:       "step seconds",
+				Destination: &dt,
+			},
 		},
 		Action: func(c *cli.Context) error {
 			if random {
@@ -120,7 +128,7 @@ func runUI(path, fileType string, savedirectory string,
 	signalChan := make(chan os.Signal, 1)
 	paths := []string{path}
 	runtime.LockOSThread()
-	ui.Run(paths, signalChan, savedirectory, disableAudio, disableVideo)
+	ui.Run(paths, signalChan, savedirectory, disableAudio, disableVideo, dt)
 
 	defer close(signalChan)
 	os.Exit(0)

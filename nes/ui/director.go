@@ -29,12 +29,13 @@ type Director struct {
 	doneChan      chan int
 	signalChan    chan os.Signal
 	savedirectory string
+	dt            float64
 }
 
 func NewDirector(window *glfw.Window, audio *Audio,
 	signalChan chan os.Signal, savedirectory string,
 	glDisabled bool, audioDisabled bool,
-	randomKeys bool) *Director {
+	randomKeys bool, dt float64) *Director {
 	director := Director{}
 	director.window = window
 	director.audio = audio
@@ -43,6 +44,7 @@ func NewDirector(window *glfw.Window, audio *Audio,
 	director.randomKeys = randomKeys
 	director.signalChan = signalChan
 	director.savedirectory = savedirectory
+	director.dt = dt
 	return &director
 }
 
@@ -88,10 +90,10 @@ func (d *Director) Step() {
 		timestamp = float64(time.Now().UnixNano())
 	}
 
-	dt := timestamp - d.timestamp
+	// dt := timestamp - d.timestamp
 	d.timestamp = timestamp
 	if d.view != nil {
-		d.view.Update(timestamp, dt)
+		d.view.Update(timestamp, d.dt)
 	}
 }
 
