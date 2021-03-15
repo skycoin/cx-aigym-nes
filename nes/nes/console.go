@@ -67,11 +67,13 @@ func (console *Console) StepFrame() int {
 	return cpuCycles
 }
 
-func (console *Console) StepSeconds(seconds float64) {
+func (console *Console) StepSeconds(seconds float64) int {
 	cycles := int(CPUFrequency * seconds)
+	totalCycles := cycles
 	for cycles > 0 {
 		cycles -= console.Step()
 	}
+	return totalCycles
 }
 
 func (console *Console) Buffer() *image.RGBA {

@@ -30,6 +30,7 @@ type Director struct {
 	signalChan    chan os.Signal
 	savedirectory string
 	dt            float64
+	time          time.Time
 }
 
 func NewDirector(window *glfw.Window, audio *Audio,
@@ -78,6 +79,7 @@ func (d *Director) SetView(view View) {
 	} else {
 		d.timestamp = glfw.GetTime()
 	}
+	d.time = time.Now()
 }
 
 func (d *Director) Step() {
@@ -90,8 +92,6 @@ func (d *Director) Step() {
 		timestamp = float64(time.Now().UnixNano())
 	}
 
-	// dt := timestamp - d.timestamp
-	d.timestamp = timestamp
 	if d.view != nil {
 		d.view.Update(timestamp, d.dt)
 	}
