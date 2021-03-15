@@ -27,6 +27,7 @@ GLOBAL OPTIONS:
    --loadjson value, --lj value  load .json file/s
    --help, -h                    show help (default: false)
    --version, -v                 print the version (default: false)
+   --speed, -s                   defines game speed, 0-unlimited speed (default: 1)
 ```
 
 # Examples
