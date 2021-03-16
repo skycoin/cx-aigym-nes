@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"runtime"
 
@@ -22,8 +23,8 @@ cx-aigym-nes
 Play game from rom files.
 
 Usage:
-  cx-aigym-nes  loadrom  --file <romfile/s> [--range <range>...] [--verbose] --random <rand>
-  cx-aigym-nes  loadjson  --file <jsonfile/s> [--range <range>...] [--verbose] --random <rand>
+  cx-aigym-nes  loadrom  --file <romfile/s> [--range <range>...] [--verbose] --random <rand> [--speed <speed>]
+  cx-aigym-nes  loadjson  --file <jsonfile/s> [--range <range>...] [--verbose] --random <rand> [--speed <speed>]
   cx-aigym-nes  loadrom  --help
   cx-aigym-nes  loadjson --help
   cx-aigym-nes -h | --help
@@ -46,12 +47,14 @@ func main() {
 		disableVideo  bool
 		random        bool
 		dt            float64
+		speed         int
 	)
 
 	app := &cli.App{
 		Name:    "cx-aigym-nes",
 		Version: "1.0.0",
 		Flags: []cli.Flag{
+
 			&cli.BoolFlag{
 				Name:        "disable-audio",
 				Usage:       "disable audio",
@@ -89,14 +92,23 @@ func main() {
 				Destination: &random,
 			},
 			&cli.Float64Flag{
-				Name:        "dt",
+				Name:        "step-seconds",
 				Value:       0.016,
-				Aliases:     []string{"d"},
-				Usage:       "step seconds",
+				Aliases:     []string{"ss"},
+				Usage:       "step seconds (dt)",
 				Destination: &dt,
+			},
+			&cli.IntFlag{
+				Name:        "speed",
+				Value:       1,
+				Aliases:     []string{"s"},
+				Usage:       "speed",
+				Destination: &speed,
 			},
 		},
 		Action: func(c *cli.Context) error {
+			fmt.Println("lsjkdlfj ***", dt)
+			ui.Speed = speed
 			if random {
 				rand.Inject()
 			}

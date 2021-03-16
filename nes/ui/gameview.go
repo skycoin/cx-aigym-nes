@@ -24,6 +24,12 @@ type KeyReader func(window *glfw.Window, turbo bool) [8]bool
 
 var ReadKeys KeyReader
 
+// Speed - game speed
+var Speed int
+
+// CyclePerMS - number of cycles per milliseconds in current machine
+var CyclePerMS float64
+
 func init() {
 	ReadKeys = readKeys
 }
@@ -111,10 +117,30 @@ func (view *GameView) Exit() {
 
 }
 
+// GetDt returns the step seconds according to the specified speed
+func (view *GameView) GetDt(dt float64) float64 {
+	cycles := int(nes.CPUFrequency * dt)
+	if CyclePerMS == 0 {
+		return dt
+	}
+
+	maxCycles := int(15 * CyclePerMS)
+	newCycles := Speed * cycles
+	if Speed == 0 {
+		return float64(maxCycles) / float64(nes.CPUFrequency)
+	}
+	if newCycles < maxCycles {
+		return float64(Speed) * dt
+	}
+	return float64(maxCycles) / float64(nes.CPUFrequency)
+}
+
 func (view *GameView) Update(t, dt float64) {
 	if dt > 1 {
 		dt = 0
 	}
+
+	dt = view.GetDt(dt)
 	window := view.director.window
 	console := view.console
 	if !view.director.glDisabled {
@@ -131,13 +157,22 @@ func (view *GameView) Update(t, dt float64) {
 	}
 
 	updateControllers(view.director, console)
-	console.StepSeconds(dt)
 
-	if !view.director.glDisabled {
+	t1 := time.Now()
+	cycles := console.StepSeconds(dt)
+	tickTime := time.Now().Sub(t1)
+	CyclePerMS = float64(cycles) / float64(tickTime.Milliseconds())
+
+	t2 := time.Now()
+	timeDiff := t2.Sub(view.director.time)
+
+	if !view.director.glDisabled && (timeDiff.Milliseconds() > 14) {
+		// fmt.Println("***** print *****", timeDiff)
 		gl.BindTexture(gl.TEXTURE_2D, view.texture)
 		setTexture(console.Buffer())
 		drawBuffer(view.director.window)
 		gl.BindTexture(gl.TEXTURE_2D, 0)
+		view.director.time = t2
 	}
 
 	if view.record {
