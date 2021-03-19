@@ -29,6 +29,7 @@ var Speed int
 
 // CyclePerMS - number of cycles per milliseconds in current machine
 var CyclePerMS float64
+var FPS float64
 
 func init() {
 	ReadKeys = readKeys
@@ -124,7 +125,7 @@ func (view *GameView) GetDt(dt float64) float64 {
 		return dt
 	}
 
-	maxCycles := int(15 * CyclePerMS)
+	maxCycles := int((1000 / FPS) * CyclePerMS)
 	newCycles := Speed * cycles
 	if Speed == 0 {
 		return float64(maxCycles) / float64(nes.CPUFrequency)
@@ -163,16 +164,11 @@ func (view *GameView) Update(t, dt float64) {
 	tickTime := time.Now().Sub(t1)
 	CyclePerMS = float64(cycles) / float64(tickTime.Milliseconds())
 
-	t2 := time.Now()
-	timeDiff := t2.Sub(view.director.time)
-
-	if !view.director.glDisabled && (timeDiff.Milliseconds() > 14) {
-		// fmt.Println("***** print *****", timeDiff)
+	if !view.director.glDisabled {
 		gl.BindTexture(gl.TEXTURE_2D, view.texture)
 		setTexture(console.Buffer())
 		drawBuffer(view.director.window)
 		gl.BindTexture(gl.TEXTURE_2D, 0)
-		view.director.time = t2
 	}
 
 	if view.record {
