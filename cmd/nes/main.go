@@ -54,6 +54,7 @@ func main() {
 		random        bool
 		dt            float64
 		speed         int
+		fps           float64
 	)
 
 	app := &cli.App{
@@ -118,6 +119,13 @@ func main() {
 				Usage:       "pprofileing",
 				Destination: &PROFILING_ENABLE,
 			},
+			&cli.Float64Flag{
+				Name:        "frames-per-second",
+				Value:       60,
+				Aliases:     []string{"fps"},
+				Usage:       "frames per second",
+				Destination: &fps,
+			},
 		},
 		Action: func(c *cli.Context) error {
 			//enables profilling with pprof
@@ -129,6 +137,7 @@ func main() {
 			}
 
 			ui.Speed = speed
+			ui.FPS = fps
 			if random {
 				rand.Inject()
 			}
