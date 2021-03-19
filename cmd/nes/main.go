@@ -1,9 +1,12 @@
 package main
 
 import (
-	"fmt"
+	log2 "log"
+	"net/http"
 	"os"
 	"runtime"
+
+	_ "net/http/pprof"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/skycoin/cx-aigym-nes/cmd/rand"
@@ -38,7 +41,10 @@ Options:
   --version             Shows version.
 
 */
+var PROFILING_ENABLE bool = false
+
 func main() {
+
 	var (
 		romPath       string
 		jsonPath      string
@@ -105,9 +111,23 @@ func main() {
 				Usage:       "speed",
 				Destination: &speed,
 			},
+			&cli.BoolFlag{
+				Name:        "pprofile",
+				Value:       false,
+				Aliases:     []string{"pp"},
+				Usage:       "pprofileing",
+				Destination: &PROFILING_ENABLE,
+			},
 		},
 		Action: func(c *cli.Context) error {
-			fmt.Println("lsjkdlfj ***", dt)
+			//enables profilling with pprof
+			//ex. 'go tool pprof http://localhost:6060/debug/pprof/profile?seconds=30'
+			if PROFILING_ENABLE == true {
+				go func() {
+					log2.Println(http.ListenAndServe("localhost:6060", nil))
+				}()
+			}
+
 			ui.Speed = speed
 			if random {
 				rand.Inject()
