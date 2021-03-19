@@ -66,7 +66,7 @@ func NewGameView(director *Director, console *nes.Console, path string, hash str
 		RomHash:    hash,
 		FrameIndex: 0,
 		texture:    texture,
-		record:     true,
+		record:     false,
 		frames:     nil,
 	}
 
