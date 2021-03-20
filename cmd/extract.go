@@ -4,7 +4,7 @@ import (
 	"os"
 
 	log "github.com/sirupsen/logrus"
-	extractor "github.com/skycoin/cx-aigym-nes/extractor/scoreextractor"
+	extractor "github.com/skycoin/cx-aigym-nes/cmd/scoreextractor"
 	"github.com/urfave/cli/v2"
 )
 
