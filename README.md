@@ -27,15 +27,37 @@ GLOBAL OPTIONS:
    --loadjson value, --lj value  load .json file/s
    --help, -h                    show help (default: false)
    --version, -v                 print the version (default: false)
-   --speed, -s                   defines game speed, 0-unlimited speed (default: 1)
+   --speed, -s                   defines game speed, 0-fastest speed (default: 1)
+   --pprofile, -pp               sets profiling (default: false)
+   --frames-per-second, -fps     sets frames per second of game (default: 60)
 ```
+
+PPROFILING: 
+
+If pprofile is true: open another terminal and run monitor for 30 secs
+#### CPU profile
+```cmd
+go tool pprof http://localhost:6060/debug/pprof/profile?seconds=30
+```
+
+#### Memory profile
+```cmd
+go tool pprof http://localhost:6060/debug/pprof/heap?seconds=30
+```
+
 
 # Examples
 ```
-./cx-aigym-nes --disable-audio --disable-video 
---loadrom ../roms/Super_mario_brothers.nes --savedirectory ../checkpoints
+cd cx-aigym-nes
+go run cmd/nes/main --disable-audio --disable-video 
+--loadrom ../roms/Super_mario_brothers.nes --savedirectory ../checkpoints --speed --fps --random
 ```
 1. --disable-audio: Disable audio, default is false if missing
 2. --disable-video: Disable video, default is false if missing
 3. --savedirectory: Where to store the state of games, default is ../checkpoints if missing
 4. --loadrom: Path of rom file
+5. --speed: Speed of games
+6. --fps: Frames per second of games
+7. --random: Random moves control
+
+
